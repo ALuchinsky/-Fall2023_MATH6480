@@ -7,6 +7,7 @@ In this project I use Bayesian approach to study results of US presidential elec
 # Data sets
 
 [1] MIT. MIT Election Lab. https://electionlab.mit.edu/data, 2023. Accessed: 2023-11-15.
+
 [2] FRED. Federal Reserve Bank. https://fred.stlouisfed.org/, 2023. Accessed: 2023-11-15.
 
 # Directory Structure
