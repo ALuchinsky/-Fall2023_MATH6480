@@ -394,10 +394,11 @@ df.COMP %>%
   geom_abline(intercept = 0, slope = 1) + 
   lims(x=c(0,1), y=c(0,1)) + xlab("true") + ylab("prediction") +
   facet_wrap(~model)
+save_fig("byCounty/Ohio_LR_comparison")
 ```
 
 
-# M3: IR + V + gdp + pci
+# M4: IR + V + gdp + pci
 
 ```{r}
 J4 <- runJAGS(c("IR", "V", "gdp", "pci"), run=TRUE)
@@ -465,17 +466,33 @@ mean(pDIC)
 df.res <- thM  %>% mutate(i = 1:nrow(.)) %>% 
   tidyr::pivot_longer(cols = -i) %>% 
   mutate(j = ceiling(as.numeric(gsub("th.","", name)))) %>% 
-  group_by(j) %>% summarize(hat.th = mean(value))
+  group_by(j) %>% summarize(hat.th = mean(value), sd=sd(value))
 ```
 
 
 ```{r}
 df.comp <- df.res %>% merge(ohio.data %>% mutate(j=1:nrow(.)), by="j") %>% mutate(th = D/V)
 df.comp %>% 
-  ggplot(aes(x=th, y=hat.th)) + geom_point() +
+  mutate(wood = (county.name == "Wood")) %>% 
+  ggplot(aes(x=th, y=hat.th, color = !wood)) + geom_point() +
   geom_abline(intercept = 0, slope = 1) + 
   geom_vline(xintercept = 0.36) +
   lims(x=c(0,1), y=c(0,1))
+```
+```{r}
+df.comp %>% transmute(j, county.name, diff=abs(th - hat.th)/sd) %>% arrange(diff) %>% 
+  head(10) %>% 
+    mutate(name = factor(county.name, levels = .$county.name)) %>% 
+  ggplot(aes(x=factor(name), y=diff)) + geom_col(color = "blue", fill="blue", width=0.7) +
+  labs(x="", y="|th-hat.th|/sd") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+
+```{r}
+i=8
+hist(M[,4+i], main=colnames(M)[4+i], xlim=c(0.37,0.38))
+abline(v=ohio.data$th[i])
 ```
 
 

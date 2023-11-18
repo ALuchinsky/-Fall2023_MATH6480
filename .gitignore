@@ -12,5 +12,9 @@ data/bak/
 *.fdb_latexmk
 *.fls
 *.log
+*.out
+*.toc
+
+
 MATH6480_Project.pdf
 

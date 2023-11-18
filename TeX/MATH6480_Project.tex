@@ -5,7 +5,6 @@
 \usepackage[latin9]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
-\usepackage[authoryear]{natbib}
 
 \makeatletter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
@@ -13,7 +12,7 @@
 \usepackage{url}
 %\usepackage{endfloat}
 
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 
 \newcommand{\QQQ}{\fbox{???}}
 \newcommand{\E}{\mathrm{E}\,}
@@ -52,9 +51,9 @@ In the following, however, we will neglect this step and consider
 only numbers of votes, given for each of the candidates.
 
 You can easily find the results of the previous US presidential elections
-in the internet. For example, on reference \citet{MIT} number of
-votes to each major party are presented in each state for from 2000,
-2004, 2008, 2012, 2016, and 2020 years.
+in the internet. For example, on reference \cite{MIT} number of votes
+to each major party are presented in each state for from 2000, 2004,
+2008, 2012, 2016, and 2020 years.
 
 It turns out also, that traditionally the candidates represent one
 of the major parties and usually people from Democratic or Republican
@@ -367,7 +366,7 @@ county of each state, so we can use this information source for more
 detailed analysis. It could be also interesting to use some data about
 economic and social situation in counties, that can influence the
 political preferences. Such data can be found, for example, on the
-official site of the Federal Reserve Bank \citet{FRED}. On this site
+official site of the Federal Reserve Bank \cite{FRED}. On this site
 for each county you can find detailed information about population,
 personal income inequality, etc. You can download tables that you
 need both directly from the browser, or using advanced API. The last
@@ -545,11 +544,41 @@ to figure \ref{fig:Ohio_LR_pairs} these predictors are strongly correlated.
 
 \end{figure}
 
+Unfortunately, the accuracy of this model is not very good. In \ref{fig:Ohio_LR_accuracy}
+you can see data about the scaled accuracy
+\begin{align*}
+\epsilon_{j}= & \frac{\left|\theta_{j}-\E\theta_{j}\right|}{\sqrt{\var\theta_{j}}}
+\end{align*}
+for some of the Ohio counties. It turns out that the most accurate
+prediction is observed for Brown county and even in this case the
+prediction is more then 10 times out of standard deviation window.
+In figure \ref{fig:Ohio_LR_comparison_Brown} you can see simulation
+results compared with observed data.
+
+\begin{figure}
+\begin{centering}
+\includegraphics[width=0.9\textwidth]{figs/byCounty/Ohio_LR_accuracy}
+\par\end{centering}
+\caption{Ohio counties arrange by prediction accuracy\label{fig:Ohio_LR_accuracy}}
+\end{figure}
+
+\begin{figure}
+\begin{centering}
+\includegraphics[width=0.9\textwidth]{figs/byCounty/Ohio_LR_comparison_Brown}
+\par\end{centering}
+\caption{Comparison of the linear model predictions with observed data for
+the Brown county\label{fig:Ohio_LR_comparison_Brown}}
+\end{figure}
+
 
 \section{Conclusion}
 
-\bibliographystyle{unsrturl}
-\bibliography{math6480_project}
+\section{References}
+
+\bibliographystyle{unsrt}
+\addcontentsline{toc}{section}{\refname}\bibliography{math6480_project}
+
+\listoffigures
 
 
 \appendix
