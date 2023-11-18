@@ -98,12 +98,12 @@ data.frame(true = ohio.data$th, predictions = th.pr) %>% ggplot(aes(y=prediction
   lims(x=c(0,1), y=c(0,1))
 ```
 ```{r}
-library(caret)
-suppressWarnings(library(MASS))
+# library(caret)
+# suppressWarnings(library(MASS))
 ```
 
 ```{r}
-step.model <- stepAIC(model, direction = "both", trace = TRUE)
+step.model <- MASS::stepAIC(model, direction = "both", trace = TRUE)
 summary(model)
 ```
 
@@ -174,6 +174,10 @@ compLogP.binom <- function(theta, y = ohio.data) {
 
 
 
+```{r}
+df.COMP <- data.frame()
+```
+
 
 # M0
 
@@ -211,6 +215,8 @@ df.res <- thM  %>% mutate(i = 1:nrow(.)) %>%
 ```
 
 
+
+
 ```{r}
 df.comp <- df.res %>% merge(ohio.data %>% mutate(j=1:nrow(.)), by="j") %>% mutate(th = D/V)
 df.comp %>% 
@@ -220,6 +226,9 @@ df.comp %>%
   lims(x=c(0,1), y=c(0,1))
 ```
 
+```{r}
+df.COMP <- rbind(df.COMP, df.comp %>% dplyr::transmute(th, hat.th, model=0))
+```
 
 
 
@@ -270,6 +279,9 @@ df.comp %>%
   lims(x=c(0,1), y=c(0,1))
 ```
 
+```{r}
+df.COMP <- rbind(df.COMP, df.comp %>% dplyr::transmute(th, hat.th, model=1))
+```
 
 # M2
 
@@ -317,6 +329,11 @@ df.comp %>%
   lims(x=c(0,1), y=c(0,1))
 ```
 
+```{r}
+df.COMP <- rbind(df.COMP, df.comp %>% dplyr::transmute(th, hat.th, model=2))
+```
+
+
 # M3
 
 ```{r}
@@ -337,6 +354,105 @@ for(i in 1:length(cnames)) {
 
 ```{r}
 thM <- data.frame(M3) %>% dplyr::select(starts_with("th"))
+meanTH <- colMeans(thM)
+compLogP.binom(meanTH)
+pDIC <- apply(thM, 1, compLogP.binom)
+mean(pDIC)
+-2*(compLogP.binom(meanTH) - mean(pDIC))
+```
+
+
+```{r}
+df.res <- thM  %>% mutate(i = 1:nrow(.)) %>% 
+  tidyr::pivot_longer(cols = -i) %>% 
+  mutate(j = ceiling(as.numeric(gsub("th.","", name)))) %>% 
+  group_by(j) %>% summarize(hat.th = mean(value))
+```
+
+
+```{r}
+df.comp <- df.res %>% merge(ohio.data %>% mutate(j=1:nrow(.)), by="j") %>% mutate(th = D/V)
+df.comp %>% 
+  ggplot(aes(x=th, y=hat.th)) + geom_point() +
+  geom_abline(intercept = 0, slope = 1) + 
+  geom_vline(xintercept = 0.36) +
+  lims(x=c(0,1), y=c(0,1))
+```
+
+```{r}
+df.COMP <- rbind(df.COMP, df.comp %>% dplyr::transmute(th, hat.th, model=3))
+```
+
+
+```{r}
+df.COMP %>% select(model) %>% unique()
+```
+
+```{r}
+df.COMP %>% 
+  ggplot(aes(x=th, y=hat.th)) + geom_point() +
+  geom_abline(intercept = 0, slope = 1) + 
+  lims(x=c(0,1), y=c(0,1)) + xlab("true") + ylab("prediction") +
+  facet_wrap(~model)
+```
+
+
+# M3: IR + V + gdp + pci
+
+```{r}
+J4 <- runJAGS(c("IR", "V", "gdp", "pci"), run=TRUE)
+M4 <- J4$M[[1]]
+M <- M4
+```
+
+```{r}
+colnames(M)
+```
+```{r}
+M.params <- M %>% data.frame(.) %>% dplyr::select(!starts_with("th"))
+M.params
+```
+
+```{r}
+library(GGally)
+```
+
+```{r}
+ggpairs(M.params[1:1000, ]) + 
+  theme(axis.text.x = element_text(angle = 90))
+save_fig("byCounty/Ohio_LR_pairs")
+```
+
+
+```{r}
+cnames <- colnames(M)
+for(i in 1:length(cnames)) {
+  if(grepl("b", cnames[i])) {
+    cat(cnames[i]," in ", mean(M[,i]),",", sd(M[,i]),"\n")
+  }
+}
+```
+
+```{r}
+sapply(strsplit(format(0.234, scientific=TRUE), split="e"), function(x) paste0("$", x[1], " \times 10^{", x[2], "}$"))
+```
+
+
+```{r}
+str <- "\\begin{align*}\n"
+for(i in 1:length(cnames)) {
+  if(grepl("b", cnames[i])) {
+    cat(cnames[i]," in ", c( mean(M[,i]), sd(M[,i])),"\n")
+  }
+}
+str <- paste0(str, "\\end{align*}\n")
+cat(str)
+```
+
+
+
+```{r}
+thM <- data.frame(M) %>% dplyr::select(starts_with("th"))
 meanTH <- colMeans(thM)
 compLogP.binom(meanTH)
 pDIC <- apply(thM, 1, compLogP.binom)

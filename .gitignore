@@ -12,6 +12,5 @@ data/bak/
 *.fdb_latexmk
 *.fls
 *.log
-*.lyx
 MATH6480_Project.pdf
 
