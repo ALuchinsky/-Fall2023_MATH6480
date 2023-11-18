@@ -1,0 +1,415 @@
+---
+title: "By State, V2"
+author: "Aleksei Luchinsky"
+date: "2023-11-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Init
+
+```{r}
+rm(list=ls())
+```
+
+
+```{r}
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(stringr))
+```
+
+```{r}
+save_fig <- function(name) {
+  file_name <- paste0("../TeX/figs/",name,".pdf")
+  cat("Saving figure to ", file_name, "\n")
+  ggsave(file_name)
+}
+```
+
+
+# Loading data and preparing data
+
+Load
+
+```{r}
+all_data <- read.csv("../data/dataverse_files/countypres_2000-2020.csv")
+```
+
+## Barplots
+
+Extract info
+
+```{r}
+df <- all_data %>% 
+  dplyr::select(year, state, party, candidatevotes) %>% 
+  filter(party %in% c("DEMOCRAT", "REPUBLICAN")) %>%
+  mutate(state = str_to_title(state), party=ifelse(party=="DEMOCRAT", "D","R")) %>% 
+  group_by(year, state, party) %>% summarise(n=sum(candidatevotes)) %>% ungroup %>% 
+  tidyr::pivot_wider(names_from = party, values_from = n) %>%
+  mutate(V=D+R)
+```
+
+```{r}
+df %>% filter(year==2000) %>% mutate(th = D/V) %>% arrange(desc(th))
+```
+
+
+```{r}
+df %>% filter(year == 2000) %>% tidyr::pivot_longer(cols = c(D, R)) %>% 
+  ggplot(aes(x=state, y=value, fill=name)) + geom_col(position = "fill") +
+  geom_hline(yintercept = 0.5, lty=2) +
+  theme(axis.text.x = element_text(angle=45, hjust = 1)) +
+  ggtitle("2000 Presidential Elections") + xlab("State") + ylab("Persentage")
+save_fig("states_2000_barplot")
+```
+
+```{r}
+df %>% filter(year == 2004) %>% tidyr::pivot_longer(cols = c(D, R)) %>% 
+  ggplot(aes(x=state, y=value, fill=name)) + geom_col(position = "fill") +
+  geom_hline(yintercept = 0.5, lty=2) +
+  theme(axis.text.x = element_text(angle=45, hjust = 1)) +
+  ggtitle("2000 Presidential Elections") + xlab("State") + ylab("Persentage")
+save_fig("states_2004_barplot")
+```
+
+## Processing data
+
+```{r}
+data <- 
+  all_data %>% 
+    select(year, state, party, candidatevotes) %>% 
+    filter(party %in% c("DEMOCRAT", "REPUBLICAN")) %>%
+    mutate(state = str_to_title(state), party=ifelse(party=="DEMOCRAT", "D","R")) %>% 
+    group_by(year, state, party) %>% summarise(n=sum(candidatevotes)) %>% ungroup %>% 
+    tidyr::pivot_wider(names_from = party, values_from = n) %>%
+    mutate(V=D+R)
+J <- nrow(data)
+data
+```
+
+```{r}
+# scale <- 500
+scaled_data <- data %>% mutate(D = floor(D/scale), R = floor(R/scale)) %>% mutate(V = D + R)
+scaled_data
+```
+
+
+
+
+
+# Binomial
+
+## JAGGS
+
+```{r}
+suppressPackageStartupMessages(library(rjags))
+suppressPackageStartupMessages(library(coda))
+```
+
+```{r}
+prepareJAGS.binom <- function(year_) {
+  model_string <- "
+  model {
+      for (i in 1:N) {
+        D[i] ~ dbin(th[i], V[i])
+        th[i] ~ dbeta(a,b)
+      }
+      a ~ dunif(1, 100)
+      b ~ dunif(1, 100)
+  }
+  "
+  data_ <- filter(scaled_data, year == year_)
+  jags <- jags.model(
+    textConnection(model_string),
+    data = list(
+        'D' = scale*data_$D,
+        "V" = scale*data_$V,
+        "N" = nrow(data_)
+    ),
+    n.chains = 4,
+    n.adapt = 100
+  )
+  jags
+}
+```
+
+
+```{r}
+y = 2000
+jags <- prepareJAGS.binom(y)
+samps <- coda.samples( jags, c("a", "b", "th[1]", "th[2]", "th[10]"), n.iter=10000 )
+M <- as.matrix(samps)
+dfM <- data.frame(M)
+```
+
+
+
+
+```{r}
+colnames(dfM)
+```
+
+## Plots
+
+### Hyper Scatter 
+
+```{r}
+dfM %>% ggplot(aes(x=a, y=b)) + geom_point(cex=0.1) +
+  ggtitle("Year = 2004")
+# save_fig("states_2004_hyper_scatter")
+```
+
+```{r}
+dfM %>% transmute(mean = a/(a+b), var = a*b/(a+b)**2/(a+b+1)) %>% 
+  tidyr::pivot_longer(cols=c(mean, var)) %>% 
+  ggplot(aes(x=value)) + geom_histogram() + facet_wrap(~name, scales = "free")
+# save_fig("state_2004_th_mean_var")
+```
+
+
+### Theta Comparison
+
+```{r}
+obs.df <- data.frame(
+  name = c("th.10.","th.1.","th.2."), 
+  value= (scaled_data$D/scaled_data$V)[c(10,1,2)]
+)
+```
+
+```{r}
+scaled_data$state[c(1,10,2)]
+```
+
+
+```{r}
+dfM %>% select(starts_with("th")) %>% tidyr::pivot_longer(everything()) %>% 
+  ggplot(aes(x=value)) + geom_histogram(alpha = 0.6) + 
+  geom_vline(data = obs.df, aes(xintercept=value), col="red", lty=2) +
+  facet_wrap(~name, scales = "free")
+# save_fig("state_2004_th_hists")
+```
+
+### year dependence of mean
+
+```{r}
+df.meanTh = data.frame()
+```
+
+
+```{r}
+analyzeYear.binom <- function(y, outVars = c("a", "b", "th[1]", "th[2]", "th[10]")) {
+  jags <- prepareJAGS.binom(y)
+  samps <- coda.samples( jags, outVars, n.iter=10000 )
+  M <- as.matrix(samps)
+  dfM <- data.frame(M)
+  df_ <- dfM %>% select(starts_with("th")) %>% tidyr::pivot_longer(everything()) %>% group_by(name) %>% summarise(mean=mean(value)) %>% 
+    mutate(year = y)
+  df_
+}
+```
+
+
+```{r}
+df.meanTh <- rbind(df.meanTh, analyzeYear.binom(2000))
+```
+
+```{r}
+df.meanTh <- rbind(df.meanTh, analyzeYear.binom(2004))
+```
+
+```{r}
+df.meanTh <- rbind(df.meanTh, analyzeYear.binom(2008))
+```
+
+```{r}
+df.meanTh <- rbind(df.meanTh, analyzeYear.binom(2012))
+```
+
+```{r}
+df.meanTh <- rbind(df.meanTh, analyzeYear.binom(2016))
+```
+
+```{r}
+df.meanTh <- rbind(df.meanTh, analyzeYear.binom(2020))
+```
+
+
+```{r}
+df.meanTh %>% ggplot(aes(x=year, y=mean, color=name)) + geom_line() + ylim(0,1) +
+  geom_hline(yintercept = 0.5, lty=2)
+# save_fig("state_time_dep")
+```
+
+
+
+## Model Accuracy
+
+```{r}
+y = 2000
+jags <- prepareJAGS.binom(y)
+samps <- coda.samples( jags, c("th"), n.iter=10000 )
+M.full.binom <- as.matrix(samps)
+```
+
+```{r}
+thBayes <- colMeans(M.full.binom)
+```
+
+
+```{r}
+compLogP.binom <- function(theta, y = filter(scaled_data, year==2000)) {
+  aaa <- sapply(1:nrow(y), function(j)   dbinom(y$D[j], size = y$V[j], prob = theta[j])     )
+  return( sum(log(aaa)))
+}
+```
+
+```{r}
+compLogP.binom(thBayes)
+```
+
+
+
+```{r}
+pb <- progress::progress_bar$new(total=nrow(M.full.binom))
+pDIC <- apply(M.full.binom, 1, compLogP.binom)
+mean(pDIC)
+```
+
+
+
+```{r}
+DIC.binom  <- -2*(compLogP.binom(thBayes) - mean(pDIC))
+DIC.binom
+```
+
+
+# Normal
+
+## prepare data
+
+```{r}
+norm_data <- scaled_data %>% 
+  mutate(yJ=log(D/R), sigma2 = (1/D+1/R)) %>% mutate(piJ = 1/sigma2)
+norm_data 
+```
+
+```{r}
+mean(norm_data$yJ)
+var(norm_data$yJ)
+```
+
+## Simulation, JAGS
+
+
+```{r}
+prepareJAGS.norm <- function(year_) {
+  data_ <- filter(norm_data, year == year_)
+  model_string <- "
+  model {
+      for (i in 1:N) {
+       y[i] ~ dnorm(nu[i], prec[i])
+       nu[i] ~ dnorm(mu, piTau)
+      }
+      mu ~ dunif(-1, 1)
+      piTau ~ dunif(1, 100)
+  }
+  "
+  jags <- jags.model(
+    textConnection(model_string),
+    data = list(
+        'y' = data_$yJ,
+        "prec"  = 1/(1/data_$D + 1/data_$R),
+        "N" = nrow(data_)
+    ),
+    n.chains = 4,
+    n.adapt = 100
+  )
+  jags
+}
+```
+
+
+
+```{r}
+jags <- prepareJAGS.norm(2004)
+samps <- coda.samples( jags, c("mu", "piTau", "nu[1]", "nu[2]", "nu[10]"), n.iter=10000 )
+M <- as.matrix(samps)
+dfM <- data.frame(M)
+```
+
+```{r}
+suppressPackageStartupMessages(library(tidyr))
+```
+
+```{r}
+dfM %>% ggplot(aes(x=mu, y=piTau)) + geom_point(cex = 0.5)
+# save_fig("states_2004_hyper_norm_scatter")
+```
+
+```{r}
+dfM %>% transmute(mu = exp(mu)/(1+exp(mu)), sig2 = 1/piTau) %>% pivot_longer(everything()) %>% 
+  ggplot(aes(x=value)) + geom_histogram(alpha = 0.5) + facet_wrap(~name, scales = "free")
+# save_fig("state_2004_norm_th_mean_var")
+```
+
+
+## Normal: Model Accuracy
+
+
+
+
+
+```{r}
+jags <- prepareJAGS.norm(2000)
+samps <- coda.samples( jags, "nu", n.iter=10000 )
+M.full.norm <- as.matrix(samps)
+```
+
+
+
+```{r}
+nuBayes <- colMeans(M.full.norm)
+names(nuBayes) <- NULL
+```
+
+
+```{r}
+compLogPNorm <- function(nu, y = filter(norm_data, year == 2000)) {
+  aaa <- sapply(1:nrow(y), function(j) dnorm(y$yJ[j], mean = nu[j], sd = sqrt(norm_data$sigma2[j])))
+  return( sum(log(aaa)))
+}
+compLogPNorm(nuBayes)
+```
+
+
+```{r}
+pDICnorm <- apply(M.full.norm, 1, compLogPNorm)
+mean(pDICnorm)
+```
+
+
+```{r}
+DIC.norm  <- -2*(compLogPNorm(nu = nuBayes) - mean(pDICnorm))
+DIC.norm
+```
+
+```{r}
+cat("DIC binom:",DIC.binom,"\n")
+cat("DIC norm:",DIC.norm,"\n")
+```
+
+
+```{r}
+pDIC <- apply(M[,-c(1,2)], 1, compLogP,
+  y=filter(scaled_data, year == 2000)
+)
+```
+
+```{r}
+DIC.binom  <- 2*(compLogP(theta = thBayes, y=filter(scaled_data, year == 2000)) - mean(pDIC))
+DIC.binom
+```

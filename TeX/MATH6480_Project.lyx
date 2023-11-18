@@ -1,0 +1,1626 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass scrartcl
+\begin_preamble
+\usepackage{lipsum}
+\usepackage{url}
+%\usepackage{endfloat}
+
+\newcommand{\QQQ}{\fbox{???}}
+\newcommand{\E}{\mathrm{E}\,}
+\newcommand{\Epost}{\mathrm{E}_\mathrm{post}\,}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine natbib
+\cite_engine_type authoryear
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Bayesian Analysis of the Election Results
+\end_layout
+
+\begin_layout Subtitle
+MATH6480, Final Project
+\end_layout
+
+\begin_layout Author
+Aleksei Luchinsky
+\end_layout
+
+\begin_layout Abstract
+This is my project
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Section
+State-Level Analysis
+\end_layout
+
+\begin_layout Subsection
+Dataset Description
+\end_layout
+
+\begin_layout Standard
+I will start my project with the analysis of the United States presidential
+ election results on the state level.
+ It is well known that there are 52 states in our country and every 4 years
+ people of these states vote for the person who will be the president of
+ the country during next presidential term.
+ The voting system in US is little bit complicated, so simple majority of
+ votes does not guarantee the the person who got it will be the winner,
+ only electoral college results are important.
+ In the following, however, we will neglect this step and consider only
+ numbers of votes, given for each of the candidates.
+\end_layout
+
+\begin_layout Standard
+You can easily find the results of the previous US presidential elections
+ in the internet.
+ For example, on reference 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "MIT"
+literal "false"
+
+\end_inset
+
+ number of votes to each major party are presented in each state for from
+ 2000, 2004, 2008, 2012, 2016, and 2020 years.
+\end_layout
+
+\begin_layout Standard
+It turns out also, that traditionally the candidates represent one of the
+ major parties and usually people from Democratic or Republican parties
+ receive noticable number of voted.
+ Results of such parties as Green, Libertarian, etc, are much smaller.
+ For this reason in the following I will concentrate only on votes for Democrati
+c and Republican parties and neglect all others.
+\end_layout
+
+\begin_layout Standard
+In figures 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Results-of-2000"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Results-of-2004"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ you can see the election results during 2000 and 2004 years.
+ It is clear that political interests of different state are different and
+ some states usually vote for democratic candidates, while the other are
+ typically republicans.
+ There are also states that are eager to change their position from year
+ ti year (so called swing states).
+ For this reason it could be interesting to perform the statistical analysis
+ of available data at different years.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/states_2000_barplot.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Results of 2000 presidential elections by state
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Results-of-2000"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/states_2004_barplot.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Results of 2004 presidential elections by state
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Results-of-2004"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Binomial Model
+\end_layout
+
+\begin_layout Subsubsection
+Description
+\end_layout
+
+\begin_layout Standard
+As it was already mentioned, in our analysis we will neglect results of
+ small parties and consider only candidates from democratic and republican
+ parties.
+ In mentioned above data set you can find number of votes for each year
+ and each sate, in the following I will denote these numbers as 
+\begin_inset Formula $D_{j}$
+\end_inset
+
+ and 
+\begin_inset Formula $R_{j}$
+\end_inset
+
+ respectively
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Note that these numbers are in thousands.
+\end_layout
+
+\end_inset
+
+.
+ Here index 
+\begin_inset Formula $j$
+\end_inset
+
+ denotes the state under analysis and I neglect the year index for a while.
+\end_layout
+
+\begin_layout Standard
+In the framework of Bayesian analysis we should start with determine the
+ form of prior distribution.
+ Since we are talking with selection of several people for total fixed number,
+ it seems reasonable to use the binomial distribution in this case:
+\begin_inset Formula 
+\begin{align}
+D_{j}|\theta_{j}\sim & \text{binom}\left(\theta_{j},V_{j}\right),\label{eq:state-binim-sampling}
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $V_{j}=D_{j}+R_{j}$
+\end_inset
+
+ is total number of voters and parameters 
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
+ represent the percentage of people who prefer democratic president for
+ each state.
+ It is clear that sampling pdf is equal to
+\begin_inset Formula 
+\begin{align*}
+p\left(D|\theta\right) & \sim\prod_{j}\theta_{j}^{D_{j}}\left(1-\theta_{j}\right)^{V_{j}-D_{j}},
+\end{align*}
+
+\end_inset
+
+where we denote complete vectors 
+\begin_inset Formula $\left\{ D_{1},D_{2},\dots\right\} $
+\end_inset
+
+ and 
+\begin_inset Formula $\left\{ \theta_{1},\theta_{2},\dots\right\} $
+\end_inset
+
+ by 
+\begin_inset Formula $D$
+\end_inset
+
+ and 
+\begin_inset Formula $\theta$
+\end_inset
+
+ respectively.
+\end_layout
+
+\begin_layout Standard
+As we know, in Baesian theory parameters 
+\begin_inset Formula $\theta$
+\end_inset
+
+ are by considered as random numbers by itself and before taking observed
+ data into account they follow some prior distribution.
+ In principle, one can take any distribution as a prior, but it is more
+ convenient to take one from conjugate family to the sampling distribution.
+ As we know, conjugate distribution for binomial is beta-distribution, so
+ in our analysis we will use
+\begin_inset Formula 
+\begin{align*}
+\theta_{j}|a,b\sim & \text{beta}\left(a,b\right)
+\end{align*}
+
+\end_inset
+
+with the prior probability density function
+\begin_inset Formula 
+\begin{align*}
+p\left(\theta|a,b\right)\sim & \prod_{j}\theta_{j}^{a-1}\left(1-\theta_{j}\right)^{b-1}.
+\end{align*}
+
+\end_inset
+
+In these expressions 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+ are hyper-parameters and we will discuss their choice later.
+\end_layout
+
+\begin_layout Standard
+The posterior distribution for 
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
+ can easily derived from above relations:
+\begin_inset Formula 
+\begin{align*}
+p\left(\theta_{j}|D_{j},a,b\right)\sim & p\left(D|\theta\right)p(\theta|a,b)\sim\\
+ & \prod_{j}\theta_{j}^{a+D_{j}-1}\left(1-\theta_{j}\right)^{b+V_{j}-D_{j}-1},
+\end{align*}
+
+\end_inset
+
+which is obviously 
+\begin_inset Formula 
+\begin{align}
+\theta_{j}\sim & \text{beta}\left(a+D_{j},b+V_{j}-D_{j}\right).\label{eq:state-binom-post}
+\end{align}
+
+\end_inset
+
+As you can see, information about election results simply modifies slightly
+ the values of the distribution parameters without change of its form (this
+ is the reason for choosing the conjugate beta distribution as prior).
+\end_layout
+
+\begin_layout Standard
+In order to perform the further analysis we need to select proper values
+ of hyper-parameters 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ As it was shown in the course, the marginal posterior distribution for
+ them is
+\begin_inset Formula 
+\begin{align}
+p\left(a,b|D\right)\sim & p\left(a,b\right)\prod_{j}\frac{\Gamma\left(a+b\right)}{\Gamma\left(a\right)\Gamma\left(b\right)}\frac{\Gamma\left(a+D_{j}\right)\Gamma\left(b+V_{j}-D_{j}\right)}{\Gamma\left(a+b+V_{j}\right)}.\label{eq:state-binom-hyperpost}
+\end{align}
+
+\end_inset
+
+This distribution, unfortunately, is not standard, so we should use some
+ numerical method for simulation.
+\end_layout
+
+\begin_layout Standard
+Thus, the simulation procedure looks as follows:
+\end_layout
+
+\begin_layout Enumerate
+Draw hyper-parameters 
+\begin_inset Formula $a$
+\end_inset
+
+, 
+\begin_inset Formula $b$
+\end_inset
+
+ from some hyper-prior;
+\end_layout
+
+\begin_layout Enumerate
+Use the accept/reject method to select pairs 
+\begin_inset Formula $\left(a,b\right)$
+\end_inset
+
+ that follows marginal posterior distribution 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:state-binom-hyperpost"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+;
+\end_layout
+
+\begin_layout Enumerate
+For each of the selected pairs 
+\begin_inset Formula $\left(a_{s},b_{s}\right)$
+\end_inset
+
+ use sampling distribution 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:state-binom-post"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to draw parameters 
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
+;
+\end_layout
+
+\begin_layout Enumerate
+Use sampling distribution 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:state-binim-sampling"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ to draw number of democratic votes 
+\begin_inset Formula $D_{j}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+Results
+\end_layout
+
+\begin_layout Standard
+Let me consider analysis results for year 2004 first.
+\end_layout
+
+\begin_layout Standard
+In figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:states-binom-hyperscatter"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ you can see the scatter plot of the hyper-parameters 
+\begin_inset Formula $a$
+\end_inset
+
+, 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ s you can see, they are concentrated near 
+\begin_inset Formula $a\approx10$
+\end_inset
+
+, 
+\begin_inset Formula $b\approx12$
+\end_inset
+
+, which gives us an estimate for mean value of the parameter 
+\begin_inset Formula $\theta$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align*}
+\E\theta= & \frac{a}{a+b}\approx0.45.
+\end{align*}
+
+\end_inset
+
+More detailed calculations (see also histograms in figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:state-binom-mean-var"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) show that this mean lies in the range
+\begin_inset Formula 
+\begin{align*}
+\theta\in & \left[0.43;0.51\right].
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/states_2004_hyper_scatter.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Scatter Plot of hyper-parameters
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:states-binom-hyperscatter"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/state_2004_th_mean_var.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Histograms of 
+\begin_inset Formula $\theta$
+\end_inset
+
+ mean and variance
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:state-binom-mean-var"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let us now consider predictions for specific states.
+ In figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:state-binom-mean-var"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ you can see comparison of the simulation results for Alabama, Florida,
+ and Alaska with observed in 2004 year values.
+ As you can see, the agreement is very nice.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/state_2004_th_hists.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Simulation results for 
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
+ (histograms) in comparison with observed data (red vertical lines).
+ Left, central, and right plots represent Alabama, Florida, and Alaska respectiv
+ely.
+ 
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:states-binom-sim"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:state_time_dep"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ you can see how electoral mood of different states changes with time.
+ It is interesting to note that Alaska (blue line) is becoming more democratic,
+ while Alabama (red line) tends to be more republican.
+ It does not mean, however, that they changed their preferences completely:
+ on the whole data range we see 
+\begin_inset Formula $\theta_{j}<0.5$
+\end_inset
+
+ for these two states.
+ It is not the fact, however, for Florida (green line), which crossed middle
+ line 
+\begin_inset Formula $\theta=0.5$
+\end_inset
+
+ several times during last 20 years.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/state_time_dep.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:state_time_dep"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Normal Model
+\end_layout
+
+\begin_layout Subsubsection
+Description
+\end_layout
+
+\begin_layout Standard
+The alternative way to describe the same dataset is to use normal distributions.
+ Number of people participating in the elections is large enough, so this
+ approach can also give good results.
+\end_layout
+
+\begin_layout Standard
+In this model I will talk not about proportions 
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
+, but about logits
+\begin_inset Formula 
+\begin{align*}
+y_{j}= & \log\frac{\theta_{j}}{1-\theta_{j}}=\log\frac{D_{j}}{V_{j}-R_{j}}.
+\end{align*}
+
+\end_inset
+
+This change of the variable is typical for categorical variables since,
+ in contrast to the proportion 
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
+, the logit is not required to be in 
+\begin_inset Formula $\left[0;1\right]$
+\end_inset
+
+ range.
+ Backward transformation from logits to original proportions is straightforward:
+\begin_inset Formula 
+\begin{align*}
+\theta_{j}= & \frac{e^{y_{j}}}{1+e^{\theta_{j}}}.
+\end{align*}
+
+\end_inset
+
+Since the logit can take any real value, it is fine to model it using normal
+ sampling distribution
+\begin_inset Formula 
+\begin{align*}
+y_{j}|\nu_{j}\sim & N\left(\nu_{j},\sigma_{j}^{2}\right),
+\end{align*}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{align*}
+\sigma_{j}^{2}= & \frac{1}{D_{j}}+\frac{1}{V_{j}-D_{j}}
+\end{align*}
+
+\end_inset
+
+is associated with the logit variance and mean 
+\begin_inset Formula $\nu_{j}$
+\end_inset
+
+ is different for each state.
+ In the Bayesian approach these means are also random variables following
+ the normal prior distribution
+\begin_inset Formula 
+\begin{align*}
+\nu_{j}|\mu,\tau^{2}\sim & N\left(\mu,\tau^{2}\right).
+\end{align*}
+
+\end_inset
+
+For hyper-parameters 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\tau^{2}$
+\end_inset
+
+ we can use some non-informative prior distribution, for example
+\begin_inset Formula 
+\begin{align*}
+\mu,\tau^{-2}\sim & \text{unif}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In figures 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:states_2004_hyper_norm_scatter"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:state_2004_norm_th_mean_var"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ you can see scatter plot of the hyper-parameters and histograms.
+ It turns out that 
+\begin_inset Formula $\hat{\theta}$
+\end_inset
+
+ histograms, generated by binomial and normal models are very close to each
+ other.
+ The same is true also for distributions over election percentages, so I
+ will not repeat figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:states-binom-sim"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ here.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/states_2004_hyper_norm_scatter.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Scatter Plot of hyper-parameters
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:states_2004_hyper_norm_scatter"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/state_2004_norm_th_mean_var.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Histograms of 
+\begin_inset Formula $\theta$
+\end_inset
+
+ mean and variance
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:state_2004_norm_th_mean_var"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Model Comparison
+\end_layout
+
+\begin_layout Standard
+As you can see, we have two models that seem to describe equally well all
+ available data on presidential elections in US on the state level.
+ The question arises which of them is better for prediction.
+ One of the ways to answer this question is to use some of Bayesian information
+ criteria for comparison.
+\end_layout
+
+\begin_layout Standard
+In the following I will discuss Deviance Information criterion (DIC).
+ In the case of the first (binom) model, for example, this metric is a differenc
+e of two estimates of log-likelyhood functions:
+\begin_inset Formula 
+\begin{align*}
+p_{DIC}= & 2\left[\log p\left(y|\hat{\theta}_{Bay}\right)-\Epost\log p\left(y|\theta\right)\right],
+\end{align*}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{align*}
+p\left(y|\theta\right)= & \prod_{j}p_{\text{binom}}\left(y_{j}|\theta_{j},V_{j}\right)
+\end{align*}
+
+\end_inset
+
+is the posterior probability of the observed data 
+\begin_inset Formula 
+\begin{align*}
+\hat{\theta}_{Bay}= & \Epost\theta=\frac{1}{S}\sum_{s=1}^{S}\theta^{(s)}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Numerical calculations show, that for year 2000 binomial model gives us
+\begin_inset Formula 
+\begin{align*}
+\log p\left(y|\hat{\theta}_{Bay}\right)\approx & -368.0,\qquad\Epost\log p\left(y|\theta\right)\approx-394.5,
+\end{align*}
+
+\end_inset
+
+which gives us
+\begin_inset Formula 
+\begin{align*}
+DIC_{\text{binom}}= & -p_{DIC}\approx-51.0.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the case of the second (normal) model the expressions are almost the
+ same.
+ The only difference is that now model parameters are 
+\begin_inset Formula $\nu_{j}$
+\end_inset
+
+ and the joint posterior probability is equal to
+\begin_inset Formula 
+\begin{align*}
+p\left(y|\nu\right)= & \prod_{j}p_{\text{norm}}\left(y_{j}|\nu_{j},\sigma_{j}^{2}\right).
+\end{align*}
+
+\end_inset
+
+Numerical calculations give us
+\begin_inset Formula 
+\begin{align*}
+\log p\left(y|\hat{\nu}_{Bay}\right)\approx & 274.2,\qquad\Epost\log p\left(y|\theta\right)\approx248.8,\\
+DIC_{norm}\approx & -50.9.
+\end{align*}
+
+\end_inset
+
+As we can see, accuracies of two considered models are very close to each
+ other, but binomial model seems to be slightly better.
+ This makes sense since binomial distribution is more appropriate for the
+ considered problem.
+\end_layout
+
+\begin_layout Section
+County-Level Analysis
+\end_layout
+
+\begin_layout Subsection
+Dataset Description
+\end_layout
+
+\begin_layout Standard
+As we have seen in the previous sections, political preferences of different
+ states differ significantly.
+ Moreover, while some of the states are consistently democratic or republican,
+ some others (so called swing states) change their position pretty often,
+ changing abruptly the whole picture.
+ It could be very interesting to try to find some reasons for such differences
+ and changes.
+ A more detailed analysis, however, show that each state is not uniform,
+ political preferences of various towns and cities in one state can differ
+ significantly.
+ This tells us the state is a too large unit and we should consider smaller
+ units, e.g.
+ counties.
+\end_layout
+
+\begin_layout Standard
+The considered above data set contains information about collected in 2000-2020
+ years votes not only on state level, but also for each county of each state,
+ so we can use this information source for more detailed analysis.
+ It could be also interesting to use some data about economic and social
+ situation in counties, that can influence the political preferences.
+ Such data can be found, for example, on the official site of the Federal
+ Reserve Bank 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "FRED"
+literal "false"
+
+\end_inset
+
+.
+ On this site for each county you can find detailed information about population
+, personal income inequality, etc.
+ You can download tables that you need both directly from the browser, or
+ using advanced API.
+ The last method is much more convenient for bulk downloads, so I have used
+ it.
+\end_layout
+
+\begin_layout Subsection
+Binomial Model
+\end_layout
+
+\begin_layout Standard
+Let me first repeat the analysis from previous section on the county level.
+ Since binomial model has shown to be better choice, I will use only it.
+\end_layout
+
+\begin_layout Standard
+As previously, votes for the democratic party in each county will be considered
+ as distributed binomially with parameters 
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
+, which by themself have the prior beta distribution with uninformative
+ uniform distribution for hyper-parameters 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ In figures 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:county-hyper-scatter"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:county-hyper-hist"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ you can see posterior scatter plot these hyper-parameters and the posterior
+ mean and variance of the distribution parameter 
+\begin_inset Formula $\theta$
+\end_inset
+
+.
+ It is clear, that in comparison with the state level (see figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:state-binom-mean-var"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), mean value of 
+\begin_inset Formula $\theta$
+\end_inset
+
+ is smaller and the histogram is wider.
+ The reason for the latter difference is clear: number of votes on county
+ level are small in comparison with state level, so more variances are expected.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/byCounty/hyperScatter.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Posterior scatter of the hyper-paarameters on the county level
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:county-hyper-scatter"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/byCounty/hyper-hist.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Posterior scatter of the hyper-paarameters on the county level
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:county-hyper-hist"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The same result can be clearly seen in figure, where simulation results
+ for 3 counties are compared with the actual data.
+ As you can see, peaks of the distributions agree perfectly with the numbers,
+ but the uncertaintintess are noticeable.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/byCounty/th-hists.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Posterior scatter of the hyper-paarameters on the county level, Left, center
+ and right panels correspond to Autauga, Cherokee, and Baldwin counties
+ (Alabama state) 
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:county-th-hist-1"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The last interesting figure that I would like to show in this section is
+ the dependence of the political prefrences on the population of the county.
+ As you can see from figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:county-th-V"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, the correlation is not very prominent, but we can suggest that with the
+ increase of the population percentage of votes in favor of democratic party
+ increases.
+ The effect is better seen on the right panel of the figure, where logarithmic
+ scale is used for both axis.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/byCounty/V-th.pdf
+	width 45text%
+
+\end_inset
+
+
+\begin_inset Graphics
+	filename figs/byCounty/V-th-log.pdf
+	width 42text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Posterior scatter of the hyper-paarameters on the county level, Left, center
+ and right panels correspond to Autauga, Cherokee, and Baldwin counties
+ (Alabama state) 
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:county-th-V"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Linear Regression
+\end_layout
+
+\begin_layout Standard
+This result shows, that there could be some hope to determine the political
+ preferences of the county using various social and economic factors as
+ predictors.
+ As it was mentioned earlier, Federal Reserve Bank database provides us
+ such information for all the counties.
+ In this subsection I will consider some of them.
+ For simplicity only situation with the Ohio state counties will be considered
+ in this subsection and we will restrict ourself to year 2000.
+\end_layout
+
+\begin_layout Standard
+In total there are 87 counties in Ohio and for each of them number of votes
+ for democratic and republican parties are know.
+ As previously, in our Bayesian approach we will use binomial sampling distribut
+ion
+\begin_inset Formula 
+\begin{align*}
+D_{i}|\theta_{j}\sim & \text{binom}\left(\theta_{j},V_{j}\right)
+\end{align*}
+
+\end_inset
+
+will be used, but now we will determine distribution parameters 
+\begin_inset Formula $\theta$
+\end_inset
+
+ from such predictors as 
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+btprint "btPrintCited"
+bibfiles "math6480_project"
+options "plain"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\start_of_appendix
+Backup
+\end_layout
+
+\begin_layout Subsection
+By state, simulation
+\end_layout
+
+\begin_layout Standard
+With the described above model the posterior distribution of the logits
+ 
+\begin_inset Formula $\nu_{j}$
+\end_inset
+
+ has the form
+\begin_inset Formula 
+\begin{align*}
+\nu_{j}|\mu,\tau^{2},y_{j}\sim & N\left(\hat{\nu}_{j},\hat{\sigma}_{j}^{2}\right),
+\end{align*}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{align*}
+\hat{\nu}_{j}= & \frac{y_{j}\pi_{j}+\mu\pi_{\tau}}{\pi_{j}+\pi_{\tau}},\qquad\hat{\sigma}_{j}^{2}=\frac{1}{\pi_{j}+\pi_{\tau}}
+\end{align*}
+
+\end_inset
+
+while 
+\begin_inset Formula $\pi_{j}=\sigma_{j}^{-2}$
+\end_inset
+
+ and 
+\begin_inset Formula $\pi_{\tau}=\tau^{-2}$
+\end_inset
+
+ are precisions of the observed data and hyper-parameters respectively.
+\end_layout
+
+\begin_layout Standard
+Now the simulation process looks like follows:
+\end_layout
+
+\begin_layout Enumerate
+Draw large number of hyper-parameters 
+\begin_inset Formula $\mu$
+\end_inset
+
+, 
+\begin_inset Formula $\tau^{2}$
+\end_inset
+
+ from the non-informative prior distribution
+\end_layout
+
+\begin_layout Enumerate
+For each state 
+\begin_inset Formula $j$
+\end_inset
+
+ calculate posterior distribution parameters 
+\begin_inset Formula $\hat{\nu}_{j}$
+\end_inset
+
+, 
+\begin_inset Formula $\hat{\sigma}_{j}^{2}$
+\end_inset
+
+;
+\end_layout
+
+\begin_layout Enumerate
+From the posterior distribution draw means 
+\begin_inset Formula $\nu_{j}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+From the sampling distribution draw logits 
+\begin_inset Formula $y_{j}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Calculate the proportions 
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In comparison with binomial model this procedure looks more complicated,
+ but we are not dealing here with any unknown distributions, like the one
+ presented in relation 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:state-binom-hyperpost"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+\end_layout
+
+\end_body
+\end_document

@@ -1,0 +1,189 @@
+---
+title: "Import Data"
+author: "Aleksei Luchinsky"
+date: "2023-11-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Importing data from https://fred.stlouisfed.org/
+
+```{r}
+suppressPackageStartupMessages(library(httr2))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(ggplot2))
+```
+
+```{r}
+rm(list=ls())
+```
+
+
+```{r}
+api_key = "73f9ac0e9f0f20c0c942a9cecc5a546c"
+url_root = "https://api.stlouisfed.org/fred/"
+```
+
+```{r}
+list.to.data.frame <- function(list_) {
+  df <- data.frame()
+  for(L in list_) {
+    df <- bind_rows(df, data.frame(L))
+  }
+  df  
+}
+```
+
+```{r}
+request.to.data.frame <- function(type_string, data_id,
+                        data_field = "categories",
+                        api_key = "73f9ac0e9f0f20c0c942a9cecc5a546c",
+                        url_root = "https://api.stlouisfed.org/fred/", sleep = 1) {
+  url <- paste0(url_root,type_string, data_id,"&api_key=",api_key,"&file_type=json")
+  req <- httr2::request(url)
+  reply <- req %>% req_method("GET") %>% req_perform %>% resp_body_json()
+  Sys.sleep(sleep)
+  list.to.data.frame(reply[[data_field]])
+}
+
+load.categories <- function(data_id, sleep=1)  request.to.data.frame("category/children?category_id=", data_id, sleep=sleep)
+load.series <- function(data_id, sleep=1) request.to.data.frame("category/series?category_id=", data_id, data_field = "series", sleep=sleep)
+
+
+```
+
+
+# Load all states
+
+```{r}
+df.states <- load.categories(27281)
+df.states
+```
+
+
+
+```{r}
+getCountyList <- function(state.line, sleep=1) {
+  id <- load.categories(state.line$id, sleep = sleep)[1,]$id
+  load.categories(id)
+}
+```
+
+
+```{r}
+load.series <- function(data_id, sleep=1) 
+  request.to.data.frame("category/series?category_id=", data_id, data_field = "seriess", sleep=sleep)
+load.observations <- function(data_id, sleep=1) 
+  request.to.data.frame("series/observations?series_id=", data_id, data_field = "observations", sleep=sleep)
+```
+
+```{r}
+loadInEq <- function(county.line, sleep = 2, search_str = "Income Inequality") {
+  county.name <-  stringr::str_split_i(county.line$name, " County", 1)
+  county.id <- county.line$id
+  cat("Loading data for ",county.name," County: ")
+  df.series <- load.series(county.id, sleep=sleep)
+  series.id <- df.series %>% filter(grepl(search_str, title)) %>% pull(id)
+  obs <- load.observations(series.id, sleep = sleep)
+  # Transform to data
+  cat(nrow(obs)," observations\n")
+  obs$county.name <- county.name
+  obs
+}
+```
+
+```{r}
+df.states
+```
+
+# Ohio
+
+```{r}
+state.line <- df.states %>% filter(grepl("Ohio", name))
+df.counties <- getCountyList(state.line)
+state.name <- state.line$name
+cat(state.name,"\n")
+```
+
+
+```{r}
+df.obs <- data.frame()
+for(i in 1:nrow(df.counties)) {
+  df.obs <- rbind(df.obs, loadInEq(df.counties[i,]))
+  Sys.sleep(1)
+}
+df.obs$state <- state.name
+df.obs <- df.obs %>% select(state, county.name, date, value)
+write.csv(df.obs %>% mutate_if(is.numeric, round, 3), paste0("../data/Gini/df.ineq_",state.name,".csv"), row.names = FALSE)
+```
+
+
+```{r}
+df.obs <- data.frame()
+for(i in 1:nrow(df.counties)) {
+  df.obs <- rbind(df.obs, loadInEq(df.counties[i,], search_str = "Real Gross Domestic Product: All Industries"))
+  Sys.sleep(1)
+}
+df.obs$state <- state.name
+df.obs <- df.obs %>% select(state, county.name, date, value)
+write.csv(df.obs %>% mutate_if(is.numeric, round, 3), paste0("../data/Gini/df.gdp_",state.name,".csv"), row.names = FALSE)
+```
+
+```{r}
+df.obs <- data.frame()
+for(i in 1:nrow(df.counties)) {
+  df.obs <- rbind(df.obs, loadInEq(df.counties[i,], search_str = "Per Capita Personal Income"))
+  Sys.sleep(1)
+}
+df.obs$state <- state.name
+df.obs <- df.obs %>% select(state, county.name, date, value)
+write.csv(df.obs %>% mutate_if(is.numeric, round, 3), paste0("../data/Gini/df.pci_",state.name,".csv"), row.names = FALSE)
+```
+
+# Massachusetts
+
+```{r}
+state.line <- df.states %>% filter(grepl("Massachusetts", name))
+df.counties <- getCountyList(state.line)
+state.name <- state.line$name
+cat(state.name,"\n")
+```
+
+
+```{r}
+df.obs <- data.frame()
+for(i in 1:nrow(df.counties)) {
+  df.obs <- rbind(df.obs, loadInEq(df.counties[i,]))
+  Sys.sleep(1)
+}
+df.obs$state <- state.name
+df.obs <- df.obs %>% select(state, county.name, date, value)
+write.csv(df.obs %>% mutate_if(is.numeric, round, 3), paste0("../data/Gini/df.ineq_",state.name,".csv"), row.names = FALSE)
+```
+
+
+```{r}
+df.obs <- data.frame()
+for(i in 1:nrow(df.counties)) {
+  df.obs <- rbind(df.obs, loadInEq(df.counties[i,], search_str = "Real Gross Domestic Product: All Industries"))
+  Sys.sleep(1)
+}
+df.obs$state <- state.name
+df.obs <- df.obs %>% select(state, county.name, date, value)
+write.csv(df.obs %>% mutate_if(is.numeric, round, 3), paste0("../data/Gini/df.gdp_",state.name,".csv"), row.names = FALSE)
+```
+
+```{r}
+df.obs <- data.frame()
+for(i in 1:nrow(df.counties)) {
+  df.obs <- rbind(df.obs, loadInEq(df.counties[i,], search_str = "Per Capita Personal Income"))
+  Sys.sleep(1)
+}
+df.obs$state <- state.name
+df.obs <- df.obs %>% select(state, county.name, date, value)
+write.csv(df.obs %>% mutate_if(is.numeric, round, 3), paste0("../data/Gini/df.pci_",state.name,".csv"), row.names = FALSE)
+```
+

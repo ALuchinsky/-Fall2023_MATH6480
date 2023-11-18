@@ -1,0 +1,531 @@
+---
+title: "Ohio, Linear Regression, JAGS"
+author: "Aleksei Luchinsky"
+date: "2023-11-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Init
+
+```{r}
+rm(list=ls())
+```
+
+
+```{r}
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(stringr))
+suppressPackageStartupMessages(library(rjags))
+suppressPackageStartupMessages(library(coda))
+```
+
+
+```{r}
+save_fig <- function(name) {
+  file_name <- paste0("../TeX/figs/",name,".pdf")
+  cat("Saving figure to ", file_name, "\n")
+  ggsave(file_name)
+}
+```
+
+
+
+# Loading data and preparing data
+
+Load
+
+```{r}
+all_data <- read.csv("../data/dataverse_files/countypres_2000-2020.csv")
+```
+
+Extract info
+
+
+```{r}
+data <- 
+  all_data %>% 
+    filter(state == "OHIO") %>% filter(year==2012) %>% 
+    select(year, state, county_name, party, candidatevotes) %>%
+    filter(party %in% c("DEMOCRAT", "REPUBLICAN")) %>%
+    mutate(state = str_to_sentence(state), county.name = str_to_sentence(county_name),  party=ifelse(party=="DEMOCRAT", "D","R")) %>%
+    group_by(year, state, county.name, party) %>% summarise(n=sum(candidatevotes)) %>% ungroup %>%
+    tidyr::pivot_wider(names_from = party, values_from = n) %>% 
+    mutate(V = D + R)
+data
+```
+
+
+
+
+```{r}
+df.IR <- read.csv("../data/Gini/df.ineq_Ohio.csv")
+df.IR$year <- as.numeric(str_split_i(df.IR$date,"-",1))
+#
+df.gdp <- read.csv("../data/Gini/df.gdp_Ohio.csv") %>% rename()
+df.gdp$year <- as.numeric(str_split_i(df.gdp$date,"-",1))
+#
+df.pci <- read.csv("../data/Gini/df.pci_Ohio.csv") %>% rename()
+df.pci$year <- as.numeric(str_split_i(df.pci$date,"-",1))
+```
+
+
+
+```{r}
+ohio.data <- data %>% 
+  mutate(th = D/V) %>% mutate(z = log(D/V)) %>% 
+  merge(df.IR, by=c("year", "state", "county.name")) %>% rename(IR = value) %>% select(-date) %>% 
+  merge(df.gdp, by=c("year", "state", "county.name")) %>% rename(gdp = value) %>% select(-date) %>% 
+  merge(df.pci, by=c("year", "state", "county.name")) %>% rename(pci = value) %>% select(-date)
+ohio.data
+```
+
+# Liner Model
+
+```{r}
+colnames(ohio.data)
+```
+
+```{r}
+model <- lm(z ~ IR + V + gdp + pci, data = ohio.data)
+z.pr <- predict(model, newdata = ohio.data)
+th.pr <- 1/(1+exp(-z.pr))
+data.frame(true = ohio.data$th, predictions = th.pr) %>% ggplot(aes(y=predictions, x=true)) + geom_point() + 
+  lims(x=c(0,1), y=c(0,1))
+```
+```{r}
+library(caret)
+suppressWarnings(library(MASS))
+```
+
+```{r}
+step.model <- stepAIC(model, direction = "both", trace = TRUE)
+summary(model)
+```
+
+
+# JAGS, Binomial Regression
+
+
+```{r}
+prepare_model_string <- function(vars = c("IR")) {
+  model_string <- "
+model {
+    for (i in 1:N) {
+      D[i] ~ dbin(th[i], V[i])
+      th[i] <- 1/(1+exp(-z[i]))
+      z[i] <- b0 "
+  for(v in vars) {
+    model_string <- paste0(model_string, " + b_",v,"*",v,"[i] ")
+  }
+  model_string <- paste0(model_string,"
+    }
+  b0 ~ dunif(-1000, 1000)
+  ")
+  for(v in vars) {
+    model_string <-  paste0(model_string, "   b_",v,"~dunif(-1000, 1000)\n")
+  }
+  model_string <- paste0(model_string, "}")
+  model_string
+}
+cat(prepare_model_string(vars = c("IR")))
+```
+```{r}
+runJAGS <- function(vars, run=TRUE) {
+  model_string <- prepare_model_string(vars)
+  varList <- lapply(vars, function(v) pull(ohio.data, v))
+  names(varList) <- vars
+  varList[["D"]] <- ohio.data$D
+  varList[["V"]] <- ohio.data$V
+  varList[["N"]] <- nrow(ohio.data)
+  for(v in vars) {
+    varList[[v]] <- pull(ohio.data, v)
+  }
+  jags <- jags.model(textConnection(model_string), varList,
+    n.chains = 4,
+    n.adapt = 100
+  )
+  M <- NA
+  monitor = c("b0", "th")
+  if(length(vars)>0) {
+    monitor <- c(monitor, as.vector(sapply(vars, function(v) paste0("b_",v))))
+  }
+  if(run) {
+    update(jags, 1000)
+    M <- coda.samples( jags, monitor, n.iter=10000 )
+  }
+  list(str = model_string, J=jags, M=M, monitor = as.vector(monitor))
+}
+```
+
+
+
+
+```{r}
+compLogP.binom <- function(theta, y = ohio.data) {
+  aaa <- sapply(1:nrow(y), function(j)   dbinom(y$D[j], size = y$V[j], prob = theta[j], log = TRUE)     )
+  return( sum(aaa))
+}
+```
+
+
+
+
+# M0
+
+```{r}
+J0 <- runJAGS(c(), run=TRUE)
+M0 <- J0$M[[1]]
+M <- M0
+```
+
+```{r}
+cnames <- colnames(M)
+for(i in 1:length(cnames)) {
+  if(grepl("b", cnames[i])) {
+    cat(cnames[i]," in ", c( mean(M[,i]), sd(M[,i])),"\n")
+  }
+}
+```
+
+
+```{r}
+thM <- data.frame(M0) %>% dplyr::select(starts_with("th"))
+meanTH <- colMeans(thM)
+compLogP.binom(meanTH)
+pDIC <- apply(thM, 1, compLogP.binom)
+mean(pDIC)
+-2*(compLogP.binom(meanTH) - mean(pDIC))
+```
+
+
+```{r}
+df.res <- thM  %>% mutate(i = 1:nrow(.)) %>% 
+  tidyr::pivot_longer(cols = -i) %>% 
+  mutate(j = ceiling(as.numeric(gsub("th.","", name)))) %>% 
+  group_by(j) %>% summarize(hat.th = mean(value))
+```
+
+
+```{r}
+df.comp <- df.res %>% merge(ohio.data %>% mutate(j=1:nrow(.)), by="j") %>% mutate(th = D/V)
+df.comp %>% 
+  ggplot(aes(x=th, y=hat.th)) + geom_point() +
+  geom_abline(intercept = 0, slope = 1) + 
+  geom_vline(xintercept = 0.36) +
+  lims(x=c(0,1), y=c(0,1))
+```
+
+
+
+
+# M1
+
+```{r}
+J1 <- runJAGS(c("IR"), run=TRUE)
+M1 <- J1$M[[1]]
+M <- M1
+```
+
+
+
+```{r}
+cnames <- colnames(M)
+for(i in 1:length(cnames)) {
+  if(grepl("b", cnames[i])) {
+    cat(cnames[i]," in ", c( mean(M[,i]), sd(M[,i])),"\n")
+  }
+}
+```
+
+
+```{r}
+thM <- data.frame(M1) %>% dplyr::select(starts_with("th"))
+meanTH <- colMeans(thM)
+compLogP.binom(meanTH)
+pDIC <- apply(thM, 1, compLogP.binom)
+mean(pDIC)
+-2*(compLogP.binom(meanTH) - mean(pDIC))
+```
+
+
+```{r}
+df.res <- thM  %>% mutate(i = 1:nrow(.)) %>% 
+  tidyr::pivot_longer(cols = -i) %>% 
+  mutate(j = ceiling(as.numeric(gsub("th.","", name)))) %>% 
+  group_by(j) %>% summarize(hat.th = mean(value))
+```
+
+
+```{r}
+df.comp <- df.res %>% merge(ohio.data %>% mutate(j=1:nrow(.)), by="j") %>% mutate(th = D/V)
+df.comp %>% 
+  ggplot(aes(x=th, y=hat.th)) + geom_point() +
+  geom_abline(intercept = 0, slope = 1) + 
+  geom_vline(xintercept = 0.36) +
+  lims(x=c(0,1), y=c(0,1))
+```
+
+
+# M2
+
+
+```{r}
+J2 <- runJAGS(c("IR", "V"), run=TRUE)
+M2 <- J2$M[[1]]
+M <- M2
+```
+
+```{r}
+cnames <- colnames(M)
+for(i in 1:length(cnames)) {
+  if(grepl("b", cnames[i])) {
+    cat(cnames[i]," in ", c( mean(M[,i]), sd(M[,i])),"\n")
+  }
+}
+```
+
+
+```{r}
+thM <- data.frame(M2) %>% dplyr::select(starts_with("th"))
+meanTH <- colMeans(thM)
+compLogP.binom(meanTH)
+pDIC <- apply(thM, 1, compLogP.binom)
+mean(pDIC)
+-2*(compLogP.binom(meanTH) - mean(pDIC))
+```
+
+
+```{r}
+df.res <- thM  %>% mutate(i = 1:nrow(.)) %>% 
+  tidyr::pivot_longer(cols = -i) %>% 
+  mutate(j = ceiling(as.numeric(gsub("th.","", name)))) %>% 
+  group_by(j) %>% summarize(hat.th = mean(value))
+```
+
+
+```{r}
+df.comp <- df.res %>% merge(ohio.data %>% mutate(j=1:nrow(.)), by="j") %>% mutate(th = D/V)
+df.comp %>% 
+  ggplot(aes(x=th, y=hat.th)) + geom_point() +
+  geom_abline(intercept = 0, slope = 1) + 
+  geom_vline(xintercept = 0.36) +
+  lims(x=c(0,1), y=c(0,1))
+```
+
+# M3
+
+```{r}
+J3 <- runJAGS(c("IR", "V", "gdp"), run=TRUE)
+M3 <- J3$M[[1]]
+M <- M3
+```
+
+```{r}
+cnames <- colnames(M)
+for(i in 1:length(cnames)) {
+  if(grepl("b", cnames[i])) {
+    cat(cnames[i]," in ", c( mean(M[,i]), sd(M[,i])),"\n")
+  }
+}
+```
+
+
+```{r}
+thM <- data.frame(M3) %>% dplyr::select(starts_with("th"))
+meanTH <- colMeans(thM)
+compLogP.binom(meanTH)
+pDIC <- apply(thM, 1, compLogP.binom)
+mean(pDIC)
+-2*(compLogP.binom(meanTH) - mean(pDIC))
+```
+
+
+```{r}
+df.res <- thM  %>% mutate(i = 1:nrow(.)) %>% 
+  tidyr::pivot_longer(cols = -i) %>% 
+  mutate(j = ceiling(as.numeric(gsub("th.","", name)))) %>% 
+  group_by(j) %>% summarize(hat.th = mean(value))
+```
+
+
+```{r}
+df.comp <- df.res %>% merge(ohio.data %>% mutate(j=1:nrow(.)), by="j") %>% mutate(th = D/V)
+df.comp %>% 
+  ggplot(aes(x=th, y=hat.th)) + geom_point() +
+  geom_abline(intercept = 0, slope = 1) + 
+  geom_vline(xintercept = 0.36) +
+  lims(x=c(0,1), y=c(0,1))
+```
+
+
+
+# M23
+
+```{r}
+J23 <- runJAGS(c("V"), run=TRUE)
+M23 <- J23$M[[1]]
+M <- M23
+```
+
+```{r}
+cnames <- colnames(M)
+for(i in 1:length(cnames)) {
+  if(grepl("b", cnames[i])) {
+    cat(cnames[i]," in ", c( mean(M[,i]), sd(M[,i])),"\n")
+  }
+}
+```
+
+
+```{r}
+thM <- data.frame(M23) %>% dplyr::select(starts_with("th"))
+meanTH <- colMeans(thM)
+compLogP.binom(meanTH)
+pDIC <- apply(thM, 1, compLogP.binom)
+mean(pDIC)
+-2*(compLogP.binom(meanTH) - mean(pDIC))
+```
+
+
+```{r}
+df.res <- thM  %>% mutate(i = 1:nrow(.)) %>% 
+  tidyr::pivot_longer(cols = -i) %>% 
+  mutate(j = ceiling(as.numeric(gsub("th.","", name)))) %>% 
+  group_by(j) %>% summarize(hat.th = mean(value))
+```
+
+
+
+```{r}
+df.comp <- df.res %>% merge(ohio.data %>% mutate(j=1:nrow(.)), by="j") %>% mutate(th = D/V)
+df.comp %>% 
+  ggplot(aes(x=th, y=hat.th)) + geom_point() +
+  geom_abline(intercept = 0, slope = 1) + 
+  geom_vline(xintercept = 0.36) +
+  lims(x=c(0,1), y=c(0,1))
+```
+
+
+
+# M23
+
+```{r}
+J24 <- runJAGS(c("V", "gdp"), run=TRUE)
+M24 <- J24$M[[1]]
+M <- M24
+```
+
+
+```{r}
+thM <- data.frame(M) %>% dplyr::select(starts_with("th"))
+meanTH <- colMeans(thM)
+compLogP.binom(meanTH)
+pDIC <- apply(thM, 1, compLogP.binom)
+mean(pDIC)
+-2*(compLogP.binom(meanTH) - mean(pDIC))
+```
+
+
+```{r}
+df.res <- thM  %>% mutate(i = 1:nrow(.)) %>% 
+  tidyr::pivot_longer(cols = -i) %>% 
+  mutate(j = ceiling(as.numeric(gsub("th.","", name)))) %>% 
+  group_by(j) %>% summarize(hat.th = mean(value))
+```
+
+
+
+```{r}
+df.comp <- df.res %>% merge(ohio.data %>% mutate(j=1:nrow(.)), by="j") %>% mutate(th = D/V)
+df.comp %>% 
+  ggplot(aes(x=th, y=hat.th)) + geom_point() +
+  geom_abline(intercept = 0, slope = 1) + 
+  geom_vline(xintercept = 0.36) +
+  lims(x=c(0,1), y=c(0,1))
+```
+
+
+# M25
+
+```{r}
+J25 <- runJAGS(c("V", "pci"), run=TRUE)
+M25 <- J25$M[[1]]
+M <- M25
+```
+
+
+```{r}
+thM <- data.frame(M) %>% dplyr::select(starts_with("th"))
+meanTH <- colMeans(thM)
+compLogP.binom(meanTH)
+pDIC <- apply(thM, 1, compLogP.binom)
+mean(pDIC)
+-2*(compLogP.binom(meanTH) - mean(pDIC))
+```
+
+
+```{r}
+df.res <- thM  %>% mutate(i = 1:nrow(.)) %>% 
+  tidyr::pivot_longer(cols = -i) %>% 
+  mutate(j = ceiling(as.numeric(gsub("th.","", name)))) %>% 
+  group_by(j) %>% summarize(hat.th = mean(value))
+```
+
+
+
+```{r}
+df.comp <- df.res %>% merge(ohio.data %>% mutate(j=1:nrow(.)), by="j") %>% mutate(th = D/V)
+df.comp %>% 
+  ggplot(aes(x=th, y=hat.th)) + geom_point() +
+  geom_abline(intercept = 0, slope = 1) + 
+  geom_vline(xintercept = 0.36) +
+  lims(x=c(0,1), y=c(0,1))
+```
+
+# M26
+
+```{r}
+J26 <- runJAGS(c("gdp", "pci"), run=TRUE)
+M26 <- J26$M[[1]]
+M <- M26
+```
+
+
+```{r}
+thM <- data.frame(M) %>% dplyr::select(starts_with("th"))
+meanTH <- colMeans(thM)
+compLogP.binom(meanTH)
+pDIC <- apply(thM, 1, compLogP.binom)
+mean(pDIC)
+-2*(compLogP.binom(meanTH) - mean(pDIC))
+```
+
+
+```{r}
+df.res <- thM  %>% mutate(i = 1:nrow(.)) %>% 
+  tidyr::pivot_longer(cols = -i) %>% 
+  mutate(j = ceiling(as.numeric(gsub("th.","", name)))) %>% 
+  group_by(j) %>% summarize(hat.th = mean(value))
+```
+
+
+
+```{r}
+df.comp <- df.res %>% merge(ohio.data %>% mutate(j=1:nrow(.)), by="j") %>% mutate(th = D/V)
+df.comp %>% 
+  ggplot(aes(x=th, y=hat.th)) + geom_point() +
+  geom_abline(intercept = 0, slope = 1) + 
+  geom_vline(xintercept = 0.36) +
+  lims(x=c(0,1), y=c(0,1))
+```
+
+
+
+
+
+

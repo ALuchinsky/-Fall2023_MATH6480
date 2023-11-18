@@ -1,0 +1,146 @@
+---
+title: "By County, All"
+author: "Aleksei Luchinsky"
+date: "2023-11-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Init
+
+```{r}
+rm(list=ls())
+```
+
+
+```{r}
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(stringr))
+suppressPackageStartupMessages(library(rjags))
+suppressPackageStartupMessages(library(coda))
+```
+
+
+```{r}
+save_fig <- function(name, width = 10, height = 5) {
+  file_name <- paste0("../TeX/figs/",name,".pdf")
+  cat("Saving figure to ", file_name, "\n")
+  ggsave(file_name, width = width, height = height)
+}
+```
+
+
+
+# Loading data and preparing data
+
+Load
+
+```{r}
+all_data <- read.csv("../data/dataverse_files/countypres_2000-2020.csv")
+```
+
+Extract info
+
+```{r}
+data <- 
+  all_data %>% 
+    select(year, state, county_name, party, candidatevotes) %>% 
+    filter(party %in% c("DEMOCRAT", "REPUBLICAN")) %>%
+    mutate(state = str_to_title(state), party=ifelse(party=="DEMOCRAT", "D","R")) %>% 
+    group_by(year, state, county_name, party) %>% summarise(n=sum(candidatevotes)) %>% ungroup %>% 
+    tidyr::pivot_wider(names_from = party, values_from = n) %>%
+    mutate(V=D+R) %>% 
+    filter(year==2000)
+data <- mutate(data, j = 1:nrow(data))
+data
+```
+
+# Binom Model, JAGS
+
+```{r}
+prepareJAGS.binom <- function(year_) {
+  model_string <- "
+  model {
+      for (i in 1:N) {
+        D[i] ~ dbin(th[i], V[i])
+        th[i] ~ dbeta(a,b)
+      }
+      a ~ dunif(1, 100)
+      b ~ dunif(1, 100)
+  }
+  "
+  data_ <- filter(data, year == year_)
+  jags <- jags.model(
+    textConnection(model_string),
+    data = list(
+        'D' = data_$D,
+        "V" = data_$V,
+        "N" = nrow(data_)
+    ),
+    n.chains = 4,
+    n.adapt = 100
+  )
+  jags
+}
+```
+
+```{r}
+y = 2000
+jags <- prepareJAGS.binom(y)
+samps <- coda.samples( jags, c("a", "b", "th"), n.iter=1000 )
+M <- as.matrix(samps)
+dfM <- data.frame(M)
+```
+```{r}
+dfM %>% ggplot(aes(x=a, y=b)) + geom_point() + ggtitle("Year 2000")
+save_fig("byCounty/hyperScatter")
+```
+
+```{r}
+dfM %>% transmute(mean = a/(a+b), var = a*b/(a+b)**2/(a+b+1)) %>% 
+  tidyr::pivot_longer(cols=c(mean, var)) %>% 
+  ggplot(aes(x=value)) + geom_histogram() + facet_wrap(~name, scales = "free") + ggtitle("Year 2000")
+save_fig("byCounty/hyper-hist")
+```
+
+```{r}
+obs.df <- data.frame(
+  name = c("th.10.","th.1.","th.2."), 
+  value= (data$D/data$V)[c(10,1,2)]
+)
+```
+
+```{r}
+str_to_sentence(data$county_name[c(1,10,2)])
+data$state[c(1,10,2)]
+```
+
+
+```{r}
+dfM %>% select(starts_with("th")) %>% tidyr::pivot_longer(everything()) %>% 
+  filter(name %in% c("th.10.","th.1.","th.2.")) %>% 
+  ggplot(aes(x=value)) + geom_histogram(alpha = 0.6) + 
+  geom_vline(data = obs.df, aes(xintercept=value), col="red", lty=2) +
+  facet_wrap(~name, scales = "free") + ggtitle("Year 2000")
+save_fig("byCounty/th-hists")
+# save_fig("state_2004_th_hists")
+```
+```{r}
+thList <- colMeans(M[,-c(1,2)])
+V.list <- data$V[1:length(thList)]
+data.frame(th=thList, V=V.list) %>% ggplot(aes(x=V, y=th)) + geom_point() + ggtitle("Year 2000")
+save_fig("byCounty/V-th", width=5)
+```
+
+```{r}
+thList <- colMeans(M[,-c(1,2)])
+V.list <- data$V[1:length(thList)]
+data.frame(th=thList, V=V.list) %>% ggplot(aes(x=V, y=th)) + 
+  scale_x_log10() + scale_y_log10() +
+  geom_point() + ggtitle("Year 2000")
+save_fig("byCounty/V-th-log", width=5)
+```
