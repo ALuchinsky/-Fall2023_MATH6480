@@ -25,3 +25,5 @@ In this project I use Bayesian approach to study results of US presidential elec
 * TeX/: directory for the report document
     * figs/: all figures here are created by Rmd files
 
+This is a test
+
