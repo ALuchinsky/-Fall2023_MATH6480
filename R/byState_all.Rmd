@@ -44,8 +44,10 @@ all_data <- read.csv("../data/dataverse_files/countypres_2000-2020.csv")
 Extract info
 
 ```{r}
+scale <- 1000
 df <- all_data %>% 
   dplyr::select(year, state, party, candidatevotes) %>% 
+  mutate(candidatevotes = ceiling(candidatevotes/scale)) %>% 
   filter(party %in% c("DEMOCRAT", "REPUBLICAN")) %>%
   mutate(state = str_to_title(state), party=ifelse(party=="DEMOCRAT", "D","R")) %>% 
   group_by(year, state, party) %>% summarise(n=sum(candidatevotes)) %>% ungroup %>% 
@@ -80,7 +82,7 @@ save_fig("states_2004_barplot")
 df %>% filter(year %in% c(2000, 2004)) %>% tidyr::pivot_longer(cols = c(D, R)) %>% 
   ggplot(aes(x=state, y=value, fill=name)) + geom_col(position = "fill") +
   geom_hline(yintercept = 0.5, lty=2) +
-  theme(axis.text.x = element_text(angle=45, hjust = 1)) +
+  theme(axis.text.x = element_text(angle=45, hjust = 1), legend.position = "top") +
   facet_wrap(~year)
   # ggtitle("2004 Presidential Elections") + xlab("State") + ylab("Persentage")
 # save_fig("states_2004_barplot")
@@ -90,9 +92,11 @@ df %>% filter(year %in% c(2000, 2004)) %>% tidyr::pivot_longer(cols = c(D, R)) %
 ## Processing data
 
 ```{r}
+scale = 1000
 data <- 
   all_data %>% 
     select(year, state, party, candidatevotes) %>% 
+    mutate(candidatevotes = ceiling(candidatevotes/scale)) %>% 
     filter(party %in% c("DEMOCRAT", "REPUBLICAN")) %>%
     mutate(state = str_to_title(state), party=ifelse(party=="DEMOCRAT", "D","R")) %>% 
     group_by(year, state, party) %>% summarise(n=sum(candidatevotes)) %>% ungroup %>% 
@@ -104,8 +108,8 @@ data
 
 ```{r}
 # scale <- 500
-scaled_data <- data %>% mutate(D = floor(D/scale), R = floor(R/scale)) %>% mutate(V = D + R)
-scaled_data
+# scaled_data <- data %>% mutate(D = floor(D/scale), R = floor(R/scale)) %>% mutate(V = D + R)
+scaled_data <- data
 ```
 
 
@@ -120,6 +124,8 @@ scaled_data
 suppressPackageStartupMessages(library(rjags))
 suppressPackageStartupMessages(library(coda))
 ```
+
+
 
 ```{r}
 prepareJAGS.binom <- function(year_) {
@@ -137,8 +143,8 @@ prepareJAGS.binom <- function(year_) {
   jags <- jags.model(
     textConnection(model_string),
     data = list(
-        'D' = scale*data_$D,
-        "V" = scale*data_$V,
+        'D' = data_$D,
+        "V" = data_$V,
         "N" = nrow(data_)
     ),
     n.chains = 4,
@@ -171,14 +177,14 @@ colnames(dfM)
 ```{r}
 dfM %>% ggplot(aes(x=a, y=b)) + geom_point(cex=0.1) +
   ggtitle("Year = 2004")
-# save_fig("states_2004_hyper_scatter")
+save_fig("states_2004_hyper_scatter")
 ```
 
 ```{r}
 dfM %>% transmute(mean = a/(a+b), var = a*b/(a+b)**2/(a+b+1)) %>% 
   tidyr::pivot_longer(cols=c(mean, var)) %>% 
   ggplot(aes(x=value)) + geom_histogram() + facet_wrap(~name, scales = "free")
-# save_fig("state_2004_th_mean_var")
+save_fig("state_2004_th_mean_var")
 ```
 
 
@@ -201,7 +207,7 @@ dfM %>% select(starts_with("th")) %>% tidyr::pivot_longer(everything()) %>%
   ggplot(aes(x=value)) + geom_histogram(alpha = 0.6) + 
   geom_vline(data = obs.df, aes(xintercept=value), col="red", lty=2) +
   facet_wrap(~name, scales = "free")
-# save_fig("state_2004_th_hists")
+save_fig("state_2004_th_hists")
 ```
 
 ### year dependence of mean
@@ -252,7 +258,7 @@ df.meanTh <- rbind(df.meanTh, analyzeYear.binom(2020))
 ```{r}
 df.meanTh %>% ggplot(aes(x=year, y=mean, color=name)) + geom_line() + ylim(0,1) +
   geom_hline(yintercept = 0.5, lty=2)
-# save_fig("state_time_dep")
+save_fig("state_time_dep")
 ```
 
 
@@ -305,7 +311,7 @@ DIC.binom
 ```{r}
 norm_data <- scaled_data %>% 
   mutate(yJ=log(D/R), sigma2 = (1/D+1/R)) %>% mutate(piJ = 1/sigma2)
-norm_data 
+norm_data
 ```
 
 ```{r}
@@ -357,14 +363,14 @@ suppressPackageStartupMessages(library(tidyr))
 ```
 
 ```{r}
-dfM %>% ggplot(aes(x=mu, y=piTau)) + geom_point(cex = 0.5)
-# save_fig("states_2004_hyper_norm_scatter")
+dfM %>% head(10000) %>% ggplot(aes(x=mu, y=piTau)) + geom_point(cex = 0.5)
+save_fig("states_2004_hyper_norm_scatter")
 ```
 
 ```{r}
 dfM %>% transmute(mu = exp(mu)/(1+exp(mu)), sig2 = 1/piTau) %>% pivot_longer(everything()) %>% 
   ggplot(aes(x=value)) + geom_histogram(alpha = 0.5) + facet_wrap(~name, scales = "free")
-# save_fig("state_2004_norm_th_mean_var")
+save_fig("state_2004_norm_th_mean_var")
 ```
 
 
@@ -414,13 +420,3 @@ cat("DIC norm:",DIC.norm,"\n")
 ```
 
 
-```{r}
-pDIC <- apply(M[,-c(1,2)], 1, compLogP,
-  y=filter(scaled_data, year == 2000)
-)
-```
-
-```{r}
-DIC.binom  <- 2*(compLogP(theta = thBayes, y=filter(scaled_data, year == 2000)) - mean(pDIC))
-DIC.binom
-```

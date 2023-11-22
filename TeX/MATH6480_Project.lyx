@@ -1108,7 +1108,7 @@ is the posterior probability of the observed data
 Numerical calculations show, that for year 2000 binomial model gives us
 \begin_inset Formula 
 \begin{align*}
-\log p\left(y|\hat{\theta}_{Bay}\right)\approx & -368.0,\qquad\Epost\log p\left(y|\theta\right)\approx-394.5,
+\log p\left(y|\hat{\theta}_{Bay}\right)\approx & -196.129,\qquad\Epost\log p\left(y|\theta\right)\approx-220.7763,
 \end{align*}
 
 \end_inset
@@ -1116,7 +1116,7 @@ Numerical calculations show, that for year 2000 binomial model gives us
 which gives us
 \begin_inset Formula 
 \begin{align*}
-DIC_{\text{binom}}= & -p_{DIC}\approx-51.0.
+DIC_{\text{binom}}= & -p_{DIC}\approx-49.29462.
 \end{align*}
 
 \end_inset

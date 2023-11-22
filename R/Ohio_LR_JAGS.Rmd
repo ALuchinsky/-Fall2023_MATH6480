@@ -47,10 +47,12 @@ Extract info
 
 
 ```{r}
+scale = 1000
 data <- 
   all_data %>% 
     filter(state == "OHIO") %>% filter(year==2012) %>% 
     select(year, state, county_name, party, candidatevotes) %>%
+    mutate(candidatevotes = ceiling(candidatevotes/scale)) %>% 
     filter(party %in% c("DEMOCRAT", "REPUBLICAN")) %>%
     mutate(state = str_to_sentence(state), county.name = str_to_sentence(county_name),  party=ifelse(party=="DEMOCRAT", "D","R")) %>%
     group_by(year, state, county.name, party) %>% summarise(n=sum(candidatevotes)) %>% ungroup %>%
@@ -407,9 +409,6 @@ M <- M4
 ```
 
 ```{r}
-colnames(M)
-```
-```{r}
 M.params <- M %>% data.frame(.) %>% dplyr::select(!starts_with("th"))
 M.params
 ```
@@ -422,6 +421,17 @@ library(GGally)
 ggpairs(M.params[1:1000, ]) + 
   theme(axis.text.x = element_text(angle = 90))
 save_fig("byCounty/Ohio_LR_pairs")
+```
+
+
+
+```{r}
+cnames <- colnames(M)
+for(i in 1:length(cnames)) {
+  if(grepl("b", cnames[i])) {
+    cat(cnames[i]," in ", mean(M[,i]),",", sd(M[,i]),"\n")
+  }
+}
 ```
 
 
@@ -481,7 +491,7 @@ df.comp %>%
 ```
 ```{r}
 df.comp %>% transmute(j, county.name, diff=abs(th - hat.th)/sd) %>% arrange(diff) %>% 
-  head(10) %>% 
+  head(20) %>% 
     mutate(name = factor(county.name, levels = .$county.name)) %>% 
   ggplot(aes(x=factor(name), y=diff)) + geom_col(color = "blue", fill="blue", width=0.7) +
   labs(x="", y="|th-hat.th|/sd") +
@@ -491,17 +501,12 @@ save_fig("byCounty/Ohio_LR_accuracy")
 ```{r}
 j=8
 thM %>% ggplot(aes(x=th.8.)) + geom_histogram(bins = 100) + geom_vline(xintercept = ohio.data$th[8], col="red", lty=2) +
-  xlim(0.37, 0.38) + xlab("theta") + ggtitle(paste0(ohio.data$county.name[8], " County"))
+   xlab("theta") + ggtitle(paste0(ohio.data$county.name[8], " County"))
 save_fig("byCounty/Ohio_LR_comparison_Brown")
   
 ```
 
 
-```{r}
-i=8
-hist(M[,4+i], main=colnames(M)[4+i], xlim=c(0.37,0.38))
-abline(v=ohio.data$th[i])
-```
 
 
 
