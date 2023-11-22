@@ -23,10 +23,10 @@ suppressPackageStartupMessages(library(stringr))
 ```
 
 ```{r}
-save_fig <- function(name) {
+save_fig <- function(name, width = 10, height=5) {
   file_name <- paste0("../TeX/figs/",name,".pdf")
   cat("Saving figure to ", file_name, "\n")
-  ggsave(file_name)
+  ggsave(file_name, width=width, height = height)
 }
 ```
 
@@ -46,11 +46,11 @@ Extract info
 ```{r}
 scale <- 1000
 df <- all_data %>% 
-  dplyr::select(year, state, party, candidatevotes) %>% 
+  dplyr::select(year, state, state_po, party, candidatevotes) %>% 
   mutate(candidatevotes = ceiling(candidatevotes/scale)) %>% 
   filter(party %in% c("DEMOCRAT", "REPUBLICAN")) %>%
   mutate(state = str_to_title(state), party=ifelse(party=="DEMOCRAT", "D","R")) %>% 
-  group_by(year, state, party) %>% summarise(n=sum(candidatevotes)) %>% ungroup %>% 
+  group_by(year, state, state_po, party) %>% summarise(n=sum(candidatevotes)) %>% ungroup %>% 
   tidyr::pivot_wider(names_from = party, values_from = n) %>%
   mutate(V=D+R)
 ```
@@ -62,30 +62,30 @@ df %>% filter(year==2000) %>% mutate(th = D/V) %>% arrange(desc(th))
 
 ```{r}
 df %>% filter(year == 2000) %>% tidyr::pivot_longer(cols = c(D, R)) %>% 
-  ggplot(aes(x=state, y=value, fill=name)) + geom_col(position = "fill") +
+  ggplot(aes(x=state_po, y=value, fill=name)) + geom_col(position = "fill") +
   geom_hline(yintercept = 0.5, lty=2) +
-  theme(axis.text.x = element_text(angle=45, hjust = 1)) +
+  theme(axis.text.x = element_text(angle=90, hjust = 1)) +
   ggtitle("2000 Presidential Elections") + xlab("State") + ylab("Persentage")
-save_fig("states_2000_barplot")
+# save_fig("states_2000_barplot")
 ```
 
 ```{r}
 df %>% filter(year == 2004) %>% tidyr::pivot_longer(cols = c(D, R)) %>% 
-  ggplot(aes(x=state, y=value, fill=name)) + geom_col(position = "fill") +
+  ggplot(aes(x=state_po, y=value, fill=name)) + geom_col(position = "fill") +
   geom_hline(yintercept = 0.5, lty=2) +
-  theme(axis.text.x = element_text(angle=45, hjust = 1)) +
+  theme(axis.text.x = element_text(angle=90, hjust = 1)) +
   ggtitle("2004 Presidential Elections") + xlab("State") + ylab("Persentage")
-save_fig("states_2004_barplot")
+# save_fig("states_2004_barplot")
 ```
 
 ```{r}
 df %>% filter(year %in% c(2000, 2004)) %>% tidyr::pivot_longer(cols = c(D, R)) %>% 
-  ggplot(aes(x=state, y=value, fill=name)) + geom_col(position = "fill") +
+  ggplot(aes(x=state_po, y=value, fill=name)) + geom_col(position = "fill") +
   geom_hline(yintercept = 0.5, lty=2) +
-  theme(axis.text.x = element_text(angle=45, hjust = 1), legend.position = "top") +
+  theme(axis.text.x = element_text(angle=90, hjust = 1), legend.position = "top") +
   facet_wrap(~year)
   # ggtitle("2004 Presidential Elections") + xlab("State") + ylab("Persentage")
-# save_fig("states_2004_barplot")
+save_fig("states_2000_2004_barplot")
 ```
 
 
@@ -166,16 +166,13 @@ dfM <- data.frame(M)
 
 
 
-```{r}
-colnames(dfM)
-```
 
 ## Plots
 
 ### Hyper Scatter 
 
 ```{r}
-dfM %>% ggplot(aes(x=a, y=b)) + geom_point(cex=0.1) +
+dfM %>% head(5000) %>% ggplot(aes(x=a, y=b)) + geom_point(cex=0.1) +
   ggtitle("Year = 2004")
 save_fig("states_2004_hyper_scatter")
 ```

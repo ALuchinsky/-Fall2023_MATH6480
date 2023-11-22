@@ -104,7 +104,13 @@ Aleksei Luchinsky
 \end_layout
 
 \begin_layout Abstract
-This is my project
+The goal of the project is to analyze US presidential elections in the 21st
+ century using the bayesian methods.
+ After downloading and preprocessing the data I have analyzed them both
+ on state and county level using various bayesian models.
+ In the last part of the report multiple liner regression model is built
+ to predict political preferences of the counties of the Ohio state using
+ various social and economic factors as predictors.
 \end_layout
 
 \begin_layout Standard
@@ -120,8 +126,62 @@ LatexCommand tableofcontents
 Introduction
 \end_layout
 
+\begin_layout Standard
+I have moved to United States in 2015 and one of the first things that surprised
+ me greatly were the presidential elections.
+ In contrast to Russia, where the results are known 2 month before the voting
+ and the only question is the support level of the current president (whether
+ it will be 75% or 80%) in US this process turned out to be very interesting,
+ exciting, and unpredictable.
+ Since then I've got a citizenship and tool part in all elections.
+\end_layout
+
+\begin_layout Standard
+In the current project I will use the my statistics and probability knowledge
+ to analyze results of US presidential elections in 21st century.
+ It is possible to use simple statistical methods to figure out mean political
+ preferences of the people of the country of extract some more detailed
+ information, but it seems more interesting to me to use the Bayesian approach
+ to this problem.
+\end_layout
+
+\begin_layout Standard
+In the next section I will perform such analysis on state level, describing
+ the chances of voting to different parties using two different sampling
+ distributions: (binomial and normal) with the corresponding conjugate priors.
+ The same analysis on the county level was performed in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:County-Level-Analysis"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Linear-Regression"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Final results are discussed briefly in the final section.
+\end_layout
+
 \begin_layout Section
 State-Level Analysis
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:State-Level-Analysis"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -166,20 +226,10 @@ c and Republican parties and neglect all others.
 \end_layout
 
 \begin_layout Standard
-In figures 
+In figure 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:Results-of-2000"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
- and 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Results-of-2004"
+reference "fig:Results-of-2000-2004"
 plural "false"
 caps "false"
 noprefix "false"
@@ -205,7 +255,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename figs/states_2000_barplot.pdf
+	filename figs/states_2000_2004_barplot.pdf
 	width 90text%
 
 \end_inset
@@ -220,48 +270,7 @@ status open
 Results of 2000 presidential elections by state
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:Results-of-2000"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename figs/states_2004_barplot.pdf
-	width 90text%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-Results of 2004 presidential elections by state
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Results-of-2004"
+name "fig:Results-of-2000-2004"
 
 \end_inset
 
@@ -557,11 +566,11 @@ noprefix "false"
 
 .
  s you can see, they are concentrated near 
-\begin_inset Formula $a\approx10$
+\begin_inset Formula $a\approx12$
 \end_inset
 
 , 
-\begin_inset Formula $b\approx12$
+\begin_inset Formula $b\approx13$
 \end_inset
 
 , which gives us an estimate for mean value of the parameter 
@@ -571,7 +580,7 @@ noprefix "false"
 :
 \begin_inset Formula 
 \begin{align*}
-\E\theta= & \frac{a}{a+b}\approx0.45.
+\E\theta= & \frac{a}{a+b}\approx0.48.
 \end{align*}
 
 \end_inset
@@ -589,7 +598,7 @@ noprefix "false"
 ) show that this mean lies in the range
 \begin_inset Formula 
 \begin{align*}
-\theta\in & \left[0.43;0.51\right].
+\theta\in & \left[0.45;0.53\right].
 \end{align*}
 
 \end_inset
@@ -1142,8 +1151,8 @@ p\left(y|\nu\right)= & \prod_{j}p_{\text{norm}}\left(y_{j}|\nu_{j},\sigma_{j}^{2
 Numerical calculations give us
 \begin_inset Formula 
 \begin{align*}
-\log p\left(y|\hat{\nu}_{Bay}\right)\approx & 274.2,\qquad\Epost\log p\left(y|\theta\right)\approx248.8,\\
-DIC_{norm}\approx & -50.9.
+\log p\left(y|\hat{\nu}_{Bay}\right)\approx & 95.77597,\qquad\Epost\log p\left(y|\theta\right)\approx71.0093,\\
+DIC_{norm}\approx & -49.53334.
 \end{align*}
 
 \end_inset
@@ -1156,6 +1165,13 @@ As we can see, accuracies of two considered models are very close to each
 
 \begin_layout Section
 County-Level Analysis
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:County-Level-Analysis"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -1276,7 +1292,7 @@ noprefix "false"
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -1321,7 +1337,7 @@ name "fig:county-hyper-scatter"
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -1370,7 +1386,7 @@ The same result can be clearly seen in figure, where simulation results
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -1387,9 +1403,12 @@ status collapsed
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Posterior scatter of the hyper-paarameters on the county level, Left, center
- and right panels correspond to Autauga, Cherokee, and Baldwin counties
- (Alabama state) 
+Posterior histograms of the parameters 
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
+  county level, Left, center and right panels correspond to Autauga, Cherokee,
+ and Baldwin counties (Alabama state) 
 \begin_inset CommandInset label
 LatexCommand label
 name "fig:county-th-hist-1"
@@ -1425,15 +1444,14 @@ noprefix "false"
 , the correlation is not very prominent, but we can suggest that with the
  increase of the population percentage of votes in favor of democratic party
  increases.
- The effect is better seen on the right panel of the figure, where logarithmic
- scale is used for both axis.
+ 
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -1444,22 +1462,13 @@ status collapsed
 \end_inset
 
 
-\begin_inset Graphics
-	filename figs/byCounty/V-th-log.pdf
-	width 42text%
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Plain Layout
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Posterior scatter of the hyper-paarameters on the county level, Left, center
- and right panels correspond to Autauga, Cherokee, and Baldwin counties
- (Alabama state) 
+Dependence of the political preferences on number of votes 
 \begin_inset CommandInset label
 LatexCommand label
 name "fig:county-th-V"
@@ -1479,8 +1488,15 @@ name "fig:county-th-V"
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Linear Regression
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Linear-Regression"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1649,7 +1665,7 @@ noprefix "false"
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -1723,11 +1739,11 @@ noprefix "false"
  are
 \begin_inset Formula 
 \begin{align*}
-\E b_{0}= & -0.8524, & \sqrt{\var b_{0}}= & 0.0086,\\
-\E b_{\text{IR}}= & 0.09002, & \sqrt{\var b_{\text{IR}}}= & 0.000558,\\
-\E b_{\text{V}}= & 4.285\times10^{-6} & \sqrt{\var b_{\text{V}}}= & 2.50\times10^{-8},\\
-\E b_{\text{gpd}}= & -2.517\times10^{-8} & \sqrt{\var b_{\text{gpd}}}= & 1.88\times10^{-10},\\
-\E b_{\text{pci}}= & -1.569\times10^{-5} & \sqrt{\var b_{\text{pci}}}= & 1.566\times10^{-7}.
+\E b_{0}= & -0.804, & \sqrt{\var b_{0}}= & 0.30020,\\
+\E b_{\text{IR}}= & 0.08938, & \sqrt{\var b_{\text{IR}}}= & 0.016730,\\
+\E b_{\text{V}}= & 0.00416 & \sqrt{\var b_{\text{V}}}= & 0.000853,\\
+\E b_{\text{gpd}}= & -2.420\times10^{-8} & \sqrt{\var b_{\text{gpd}}}= & 6.685\times10^{-9},\\
+\E b_{\text{pci}}= & -1.659\times10^{-5} & \sqrt{\var b_{\text{pci}}}= & 5.1691\times10^{-6}.
 \end{align*}
 
 \end_inset
@@ -1765,7 +1781,7 @@ noprefix "false"
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -1807,7 +1823,7 @@ name "fig:Ohio_LR_pairs"
 \end_layout
 
 \begin_layout Standard
-Unfortunately, the accuracy of this model is not very good.
+For some of the states the accuracy of the model turned out to be very good.
  In 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -1827,27 +1843,24 @@ noprefix "false"
 \end_inset
 
 for some of the Ohio counties.
- It turns out that the most accurate prediction is observed for Brown county
- and even in this case the prediction is more then 10 times out of standard
- deviation window.
  In figure 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:Ohio_LR_comparison_Brown"
+reference "fig:Ohio_LR_compare_sim"
 plural "false"
 caps "false"
 noprefix "false"
 
 \end_inset
 
- you can see simulation results compared with observed data.
+ you can see some simulation results compared with observed data.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \align center
@@ -1893,7 +1906,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename figs/byCounty/Ohio_LR_comparison_Brown.pdf
+	filename figs/byCounty/Ohio_LR_compare_sim.pdf
 	width 90text%
 
 \end_inset
@@ -1905,11 +1918,11 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Comparison of the linear model predictions with observed data for the Brown
- county
+Comparison of the linear model predictions with observed data for some Ohio
+ counties
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:Ohio_LR_comparison_Brown"
+name "fig:Ohio_LR_compare_sim"
 
 \end_inset
 
@@ -1928,6 +1941,38 @@ name "fig:Ohio_LR_comparison_Brown"
 
 \begin_layout Section
 Conclusion
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Conclusion"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Current project is devoted to analysis of US election results in the 21st
+ century.
+\end_layout
+
+\begin_layout Standard
+I have considered available data about these elections both on state and
+ county levels in the framework of the Bayesian approach using two sampling
+ distributions: binomial and normal.
+ The prior distributions for the parameters were selected from the corresponding
+ conjugated distributions and I have used non-informative hyper-priors for
+ the hyper-parameters.Such approach allowed me to determine the posterior
+ domain range of these hyper-parameters and make posterior preductions for
+ the election chances of different parties.
+ They turned out to be in good agreement with observed data.
+\end_layout
+
+\begin_layout Standard
+In the final section of the report I an using such social and economic metrics
+ as number of voters, gross domestic product, income inequality, etc., to
+ make predictions about the election chances.
+ For the counties in Ohio state this model turns out to be reasonably accurate,
+ although the prediction uncertainties are rather large.
 \end_layout
 
 \begin_layout Standard
@@ -1940,6 +1985,7 @@ literal "false"
 \end_inset
 
 .
+ 
 \end_layout
 
 \begin_layout Section
@@ -1951,7 +1997,7 @@ References
 LatexCommand bibtex
 btprint "btPrintCited"
 bibfiles "math6480_project"
-options "bibtotoc,unsrt"
+options "unsrt"
 
 \end_inset
 

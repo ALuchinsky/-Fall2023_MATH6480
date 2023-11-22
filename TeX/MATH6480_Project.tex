@@ -30,13 +30,41 @@
 \author{Aleksei Luchinsky}
 \maketitle
 \begin{abstract}
-This is my project
+The goal of the project is to analyze US presidential elections in
+the 21st century using the bayesian methods. After downloading and
+preprocessing the data I have analyzed them both on state and county
+level using various bayesian models. In the last part of the report
+multiple liner regression model is built to predict political preferences
+of the counties of the Ohio state using various social and economic
+factors as predictors.
 \end{abstract}
 \tableofcontents{}
 
 \section{Introduction}
 
-\section{State-Level Analysis}
+I have moved to United States in 2015 and one of the first things
+that surprised me greatly were the presidential elections. In contrast
+to Russia, where the results are known 2 month before the voting and
+the only question is the support level of the current president (whether
+it will be 75\% or 80\%) in US this process turned out to be very
+interesting, exciting, and unpredictable. Since then I've got a citizenship
+and tool part in all elections.
+
+In the current project I will use the my statistics and probability
+knowledge to analyze results of US presidential elections in 21st
+century. It is possible to use simple statistical methods to figure
+out mean political preferences of the people of the country of extract
+some more detailed information, but it seems more interesting to me
+to use the Bayesian approach to this problem.
+
+In the next section I will perform such analysis on state level, describing
+the chances of voting to different parties using two different sampling
+distributions: (binomial and normal) with the corresponding conjugate
+priors. The same analysis on the county level was performed in section
+\ref{sec:County-Level-Analysis} and section \ref{sec:Linear-Regression}.
+Final results are discussed briefly in the final section.
+
+\section{State-Level Analysis\label{sec:State-Level-Analysis}}
 
 \subsection{Dataset Description}
 
@@ -62,27 +90,20 @@ as Green, Libertarian, etc, are much smaller. For this reason in the
 following I will concentrate only on votes for Democratic and Republican
 parties and neglect all others.
 
-In figures \ref{fig:Results-of-2000} and \ref{fig:Results-of-2004}
-you can see the election results during 2000 and 2004 years. It is
-clear that political interests of different state are different and
-some states usually vote for democratic candidates, while the other
-are typically republicans. There are also states that are eager to
-change their position from year ti year (so called swing states).
-For this reason it could be interesting to perform the statistical
-analysis of available data at different years.
+In figure \ref{fig:Results-of-2000-2004} you can see the election
+results during 2000 and 2004 years. It is clear that political interests
+of different state are different and some states usually vote for
+democratic candidates, while the other are typically republicans.
+There are also states that are eager to change their position from
+year ti year (so called swing states). For this reason it could be
+interesting to perform the statistical analysis of available data
+at different years.
 
 \begin{figure}
 \begin{centering}
-\includegraphics[width=0.9\textwidth]{figs/states_2000_barplot}
+\includegraphics[width=0.9\textwidth]{figs/states_2000_2004_barplot}
 \par\end{centering}
-\caption{Results of 2000 presidential elections by state\label{fig:Results-of-2000}}
-\end{figure}
-
-\begin{figure}
-\begin{centering}
-\includegraphics[width=0.9\textwidth]{figs/states_2004_barplot}
-\par\end{centering}
-\caption{Results of 2004 presidential elections by state\label{fig:Results-of-2004}}
+\caption{Results of 2000 presidential elections by state\label{fig:Results-of-2000-2004}}
 \end{figure}
 
 
@@ -173,15 +194,15 @@ Let me consider analysis results for year 2004 first.
 
 In figure \ref{fig:states-binom-hyperscatter} you can see the scatter
 plot of the hyper-parameters $a$, $b$. s you can see, they are concentrated
-near $a\approx10$, $b\approx12$, which gives us an estimate for
+near $a\approx12$, $b\approx13$, which gives us an estimate for
 mean value of the parameter $\theta$:
 \begin{align*}
-\E\theta= & \frac{a}{a+b}\approx0.45.
+\E\theta= & \frac{a}{a+b}\approx0.48.
 \end{align*}
 More detailed calculations (see also histograms in figure \ref{fig:state-binom-mean-var})
 show that this mean lies in the range
 \begin{align*}
-\theta\in & \left[0.43;0.51\right].
+\theta\in & \left[0.45;0.53\right].
 \end{align*}
 
 \begin{figure}
@@ -349,7 +370,7 @@ to each other, but binomial model seems to be slightly better. This
 makes sense since binomial distribution is more appropriate for the
 considered problem.
 
-\section{County-Level Analysis}
+\section{County-Level Analysis\label{sec:County-Level-Analysis}}
 
 \subsection{Dataset Description}
 
@@ -420,9 +441,9 @@ uncertaintintess are noticeable.
 \begin{centering}
 \includegraphics[width=0.9\textwidth]{figs/byCounty/th-hists}
 \par\end{centering}
-\caption{Posterior scatter of the hyper-paarameters on the county level, Left,
-center and right panels correspond to Autauga, Cherokee, and Baldwin
-counties (Alabama state) \label{fig:county-th-hist-1}}
+\caption{Posterior histograms of the parameters $\theta_{j}$  county level,
+Left, center and right panels correspond to Autauga, Cherokee, and
+Baldwin counties (Alabama state) \label{fig:county-th-hist-1}}
 \end{figure}
 
 The last interesting figure that I would like to show in this section
@@ -440,7 +461,7 @@ party increases.
 \end{figure}
 
 
-\subsection{Linear Regression}
+\section{Linear Regression\label{sec:Linear-Regression}}
 
 This result shows, that there could be some hope to determine the
 political preferences of the county using various social and economic
@@ -545,16 +566,14 @@ to figure \ref{fig:Ohio_LR_pairs} these predictors are strongly correlated.
 
 \end{figure}
 
-Unfortunately, the accuracy of this model is not very good. In \ref{fig:Ohio_LR_accuracy}
-you can see data about the scaled accuracy
+For some of the states the accuracy of the model turned out to be
+very good. In \ref{fig:Ohio_LR_accuracy} you can see data about the
+scaled accuracy
 \begin{align*}
 \epsilon_{j}= & \frac{\left|\theta_{j}-\E\theta_{j}\right|}{\sqrt{\var\theta_{j}}}
 \end{align*}
-for some of the Ohio counties. It turns out that the most accurate
-prediction is observed for Brown county and even in this case the
-prediction is more then 10 times out of standard deviation window.
-In figure \ref{fig:Ohio_LR_comparison_Brown} you can see simulation
-results compared with observed data.
+for some of the Ohio counties. In figure \ref{fig:Ohio_LR_compare_sim}
+you can see some simulation results compared with observed data.
 
 \begin{figure}
 \begin{centering}
@@ -565,22 +584,41 @@ results compared with observed data.
 
 \begin{figure}
 \begin{centering}
-\includegraphics[width=0.9\textwidth]{figs/byCounty/Ohio_LR_comparison_Brown}
+\includegraphics[width=0.9\textwidth]{figs/byCounty/Ohio_LR_compare_sim}
 \par\end{centering}
 \caption{Comparison of the linear model predictions with observed data for
-the Brown county\label{fig:Ohio_LR_comparison_Brown}}
+some Ohio counties\label{fig:Ohio_LR_compare_sim}}
 \end{figure}
 
 
-\section{Conclusion}
+\section{Conclusion\label{sec:Conclusion}}
+
+Current project is devoted to analysis of US election results in the
+21st century.
+
+I have considered available data about these elections both on state
+and county levels in the framework of the Bayesian approach using
+two sampling distributions: binomial and normal. The prior distributions
+for the parameters were selected from the corresponding conjugated
+distributions and I have used non-informative hyper-priors for the
+hyper-parameters.Such approach allowed me to determine the posterior
+domain range of these hyper-parameters and make posterior preductions
+for the election chances of different parties. They turned out to
+be in good agreement with observed data.
+
+In the final section of the report I an using such social and economic
+metrics as number of voters, gross domestic product, income inequality,
+etc., to make predictions about the election chances. For the counties
+in Ohio state this model turns out to be reasonably accurate, although
+the prediction uncertainties are rather large.
 
 You can see all related to this project files in my GitLab repository
-\cite{LuchGitLab}.
+\cite{LuchGitLab}. 
 
 \section{References}
 
 \bibliographystyle{unsrt}
-\addcontentsline{toc}{section}{\refname}\bibliography{math6480_project}
+\bibliography{math6480_project}
 
 \listoffigures
 

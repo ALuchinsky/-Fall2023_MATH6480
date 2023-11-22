@@ -26,10 +26,10 @@ suppressPackageStartupMessages(library(coda))
 
 
 ```{r}
-save_fig <- function(name) {
+save_fig <- function(name, width = 10, height=5) {
   file_name <- paste0("../TeX/figs/",name,".pdf")
   cat("Saving figure to ", file_name, "\n")
-  ggsave(file_name)
+  ggsave(file_name, width=width, height = height)
 }
 ```
 
@@ -426,6 +426,7 @@ save_fig("byCounty/Ohio_LR_pairs")
 
 
 ```{r}
+M <- M4
 cnames <- colnames(M)
 for(i in 1:length(cnames)) {
   if(grepl("b", cnames[i])) {
@@ -436,6 +437,7 @@ for(i in 1:length(cnames)) {
 
 
 ```{r}
+M <- M4
 cnames <- colnames(M)
 for(i in 1:length(cnames)) {
   if(grepl("b", cnames[i])) {
@@ -450,6 +452,7 @@ sapply(strsplit(format(0.234, scientific=TRUE), split="e"), function(x) paste0("
 
 
 ```{r}
+M <- M4
 str <- "\\begin{align*}\n"
 for(i in 1:length(cnames)) {
   if(grepl("b", cnames[i])) {
@@ -489,6 +492,7 @@ df.comp %>%
   geom_vline(xintercept = 0.36) +
   lims(x=c(0,1), y=c(0,1))
 ```
+
 ```{r}
 df.comp %>% transmute(j, county.name, diff=abs(th - hat.th)/sd) %>% arrange(diff) %>% 
   head(20) %>% 
@@ -498,13 +502,33 @@ df.comp %>% transmute(j, county.name, diff=abs(th - hat.th)/sd) %>% arrange(diff
   theme(axis.text.x = element_text(angle = 90))
 save_fig("byCounty/Ohio_LR_accuracy")
 ```
+
 ```{r}
-j=8
-thM %>% ggplot(aes(x=th.8.)) + geom_histogram(bins = 100) + geom_vline(xintercept = ohio.data$th[8], col="red", lty=2) +
-   xlab("theta") + ggtitle(paste0(ohio.data$county.name[8], " County"))
-save_fig("byCounty/Ohio_LR_comparison_Brown")
-  
+df.comp %>% transmute(j, county.name, diff=abs(th - hat.th)/sd) %>% arrange(diff)
 ```
+
+```{r}
+eval(parse(text="th.41."))
+```
+
+```{r}
+all_data$year %>% unique()
+```
+
+
+```{r}
+counties <- c("Jefferson", "Brown", "Portage", "Wood")
+thM %>% tidyr::pivot_longer(everything()) %>% mutate(j=as.integer(gsub("th.","", name))) %>% 
+  merge(df.comp, by="j") %>% select(j, value, county.name, th) %>% 
+  filter(county.name %in% counties) %>% 
+  mutate(county.name = factor(county.name, levels=counties))  %>% 
+  ggplot(aes(x=value)) + geom_histogram() + 
+  geom_vline(aes(xintercept = th), col="red", lty=2, lwd=1) + facet_wrap(~county.name) +
+  ggtitle("LM compaarison")
+save_fig("byCounty/Ohio_LR_compare_sim")
+```
+
+
 
 
 
