@@ -10,6 +10,8 @@
 \usepackage{url}
 %\usepackage{endfloat}
 
+\usepackage[hidelinks]{hyperref}
+
 \newcommand{\QQQ}{\fbox{???}}
 \newcommand{\E}{\mathrm{E}\,}
 \newcommand{\var}{\mathrm{Var}\,}
@@ -55,8 +57,8 @@
 \use_package stackrel 1
 \use_package stmaryrd 1
 \use_package undertilde 1
-\cite_engine natbib
-\cite_engine_type authoryear
+\cite_engine basic
+\cite_engine_type default
 \biblio_style plain
 \use_bibtopic false
 \use_indices false
@@ -103,6 +105,15 @@ Aleksei Luchinsky
 
 \begin_layout Abstract
 This is my project
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -906,6 +917,9 @@ For hyper-parameters
 \end_inset
 
  we can use some non-informative prior distribution, for example
+\end_layout
+
+\begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
 \mu,\tau^{-2}\sim & \text{unif}.
@@ -914,6 +928,10 @@ For hyper-parameters
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsubsection
+Results
 \end_layout
 
 \begin_layout Standard
@@ -1590,7 +1608,7 @@ It should be noted that model parameters
 
  are universal (i.e.
  the same for all counties in the Ohio state).
- We have selected the simplest non-informativeprior distribution for these
+ We have selected the simplest non-informative prior distribution for these
  parameters:
 \begin_inset Formula 
 \begin{align*}
@@ -1606,6 +1624,87 @@ where the limiting values were selected to be large enough to capture all
 \begin_layout Standard
 Let us first compare model predictions with the observed values, and then
  discuss the fitting results.
+ In figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Ohio_LR_comparison"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ you can see results, obtained with the simplest possible model (intercept
+ only) and some others with increasing complexity.
+ As you can see, the zero approximation gives us a reasonable result, and
+ even after addition of the first predictor (inequality ration, 
+\begin_inset Formula $\text{IR}_{j}$
+\end_inset
+
+) agreement improves significantly.
+ More complex models also give us some increase in accuracy.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/byCounty/Ohio_LR_comparison.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Comparison of the linear models' predictions with true values.
+ Labels 0, 1, 2, 3 correspond to models 
+\begin_inset Formula $y=b_{0}$
+\end_inset
+
+, 
+\begin_inset Formula $y=b_{0}+b_{\text{IR}}\text{IR}$
+\end_inset
+
+, 
+\begin_inset Formula $y=b_{0}+b_{\text{IR}}\text{IR}+b_{\text{V}}\text{V}$
+\end_inset
+
+, and 
+\begin_inset Formula $y=b_{0}+b_{\text{IR}}\text{IR}+b_{\text{V}}\text{V}+b_{\text{GPD}}\text{GPD}$
+\end_inset
+
+ respectively
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Ohio_LR_comparison"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1633,14 +1732,40 @@ noprefix "false"
 
 \end_inset
 
+As you can see, all the predictors seem to be significant.
+ It is interesting to note, that the coefficient of the 
+\begin_inset Formula $\text{IR}$
+\end_inset
 
+ predictor is positive, meaning that high inequality increase the chances
+ of the democratic party.
+ The coefficients 
+\begin_inset Formula $b_{\text{GPD}}$
+\end_inset
+
+, 
+\begin_inset Formula $b_{\text{PCI}}$
+\end_inset
+
+, on the other hand, are negative.
+ One should keep in mind, however, that according to figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Ohio_LR_pairs"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ these predictors are strongly correlated.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \align center
@@ -1681,8 +1806,144 @@ name "fig:Ohio_LR_pairs"
 
 \end_layout
 
+\begin_layout Standard
+Unfortunately, the accuracy of this model is not very good.
+ In 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Ohio_LR_accuracy"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ you can see data about the scaled accuracy
+\begin_inset Formula 
+\begin{align*}
+\epsilon_{j}= & \frac{\left|\theta_{j}-\E\theta_{j}\right|}{\sqrt{\var\theta_{j}}}
+\end{align*}
+
+\end_inset
+
+for some of the Ohio counties.
+ It turns out that the most accurate prediction is observed for Brown county
+ and even in this case the prediction is more then 10 times out of standard
+ deviation window.
+ In figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Ohio_LR_comparison_Brown"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ you can see simulation results compared with observed data.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/byCounty/Ohio_LR_accuracy.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Ohio counties arrange by prediction accuracy
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Ohio_LR_accuracy"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename figs/byCounty/Ohio_LR_comparison_Brown.pdf
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Comparison of the linear model predictions with observed data for the Brown
+ county
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Ohio_LR_comparison_Brown"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Conclusion
+\end_layout
+
+\begin_layout Standard
+You can see all related to this project files in my GitLab repository 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "LuchGitLab"
+literal "false"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+References
 \end_layout
 
 \begin_layout Standard
@@ -1690,7 +1951,15 @@ Conclusion
 LatexCommand bibtex
 btprint "btPrintCited"
 bibfiles "math6480_project"
-options "plain"
+options "bibtotoc,unsrt"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FloatList figure
 
 \end_inset
 

@@ -72,9 +72,20 @@ df %>% filter(year == 2004) %>% tidyr::pivot_longer(cols = c(D, R)) %>%
   ggplot(aes(x=state, y=value, fill=name)) + geom_col(position = "fill") +
   geom_hline(yintercept = 0.5, lty=2) +
   theme(axis.text.x = element_text(angle=45, hjust = 1)) +
-  ggtitle("2000 Presidential Elections") + xlab("State") + ylab("Persentage")
+  ggtitle("2004 Presidential Elections") + xlab("State") + ylab("Persentage")
 save_fig("states_2004_barplot")
 ```
+
+```{r}
+df %>% filter(year %in% c(2000, 2004)) %>% tidyr::pivot_longer(cols = c(D, R)) %>% 
+  ggplot(aes(x=state, y=value, fill=name)) + geom_col(position = "fill") +
+  geom_hline(yintercept = 0.5, lty=2) +
+  theme(axis.text.x = element_text(angle=45, hjust = 1)) +
+  facet_wrap(~year)
+  # ggtitle("2004 Presidential Elections") + xlab("State") + ylab("Persentage")
+# save_fig("states_2004_barplot")
+```
+
 
 ## Processing data
 
