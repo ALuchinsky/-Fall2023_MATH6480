@@ -1072,6 +1072,118 @@ name "fig:state_2004_norm_th_mean_var"
 \end_layout
 
 \begin_layout Subsection
+Simple Normal Model
+\end_layout
+
+\begin_layout Standard
+An alternative approach is to derive posterior distributions of the sampling
+ parameters 
+\begin_inset Formula $\nu_{j}$
+\end_inset
+
+ analytically.
+ With the described above model we have
+\begin_inset Formula 
+\begin{align*}
+\nu_{j}|\mu,\tau^{2},y_{j}\sim & N\left(\hat{\nu}_{j},\hat{\sigma}_{j}^{2}\right),
+\end{align*}
+
+\end_inset
+
+where
+\begin_inset Formula 
+\begin{align*}
+\hat{\nu}_{j}= & \frac{y_{j}\pi_{j}+\mu\pi_{\tau}}{\pi_{j}+\pi_{\tau}},\qquad\hat{\sigma}_{j}^{2}=\frac{1}{\pi_{j}+\pi_{\tau}}
+\end{align*}
+
+\end_inset
+
+while 
+\begin_inset Formula $\pi_{j}=\sigma_{j}^{-2}$
+\end_inset
+
+ and 
+\begin_inset Formula $\pi_{\tau}=\tau^{-2}$
+\end_inset
+
+ are precisions of the observed data and hyper-parameters respectively.
+\end_layout
+
+\begin_layout Standard
+Now the simulation process looks like follows:
+\end_layout
+
+\begin_layout Enumerate
+Draw large number of hyper-parameters 
+\begin_inset Formula $\mu$
+\end_inset
+
+, 
+\begin_inset Formula $\tau^{2}$
+\end_inset
+
+ from the non-informative prior distribution
+\end_layout
+
+\begin_layout Enumerate
+For each state 
+\begin_inset Formula $j$
+\end_inset
+
+ calculate posterior distribution parameters 
+\begin_inset Formula $\hat{\nu}_{j}$
+\end_inset
+
+, 
+\begin_inset Formula $\hat{\sigma}_{j}^{2}$
+\end_inset
+
+;
+\end_layout
+
+\begin_layout Enumerate
+From the posterior distribution draw means 
+\begin_inset Formula $\nu_{j}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+From the sampling distribution draw logits 
+\begin_inset Formula $y_{j}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Calculate the proportions 
+\begin_inset Formula $\theta_{j}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In comparison with binomial model this procedure looks more complicated,
+ but we are not dealing here with any unknown distributions, like the one
+ presented in relation 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:state-binom-hyperpost"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+.
+ Results of this simulation are the same as previously, so we will not present
+ them here.
+\end_layout
+
+\begin_layout Subsection
 Model Comparison
 \end_layout
 
@@ -1659,13 +1771,24 @@ noprefix "false"
 
 ) agreement improves significantly.
  More complex models also give us some increase in accuracy.
+ This can be clearly seen from table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:DIC-for-models"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, where DIC metrics for different models are shown.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float figure
 wide false
 sideways false
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \align center
@@ -1712,6 +1835,308 @@ name "fig:Ohio_LR_comparison"
 \end_inset
 
  
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Model
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\log p\left(y|\theta_{\text{Baayes}}\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $E\log\left(y|\theta\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $p_{\text{DIC}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $b_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-333.3049
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-333.7895
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-0.9692657
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $b_{0}+b_{IR}\text{IR}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-240.4385
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-241.3995
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-1.922085
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $b_{0}+b_{IR}\text{IR}+b_{V}V$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-233.93
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-235.2663
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-2.672603
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $b_{0}+b_{IR}\text{IR}+b_{V}V+b_{\text{gdp}}\text{gdp}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-221.997
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-223.9866
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-3.979182
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $b_{0}+b_{IR}\text{IR}+b_{V}V+b_{\text{gdp}}\text{gdp}+b_{\text{pci}}\text{pci}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-216.7918
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-219.0379
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-4.492316
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+DIC for models
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:DIC-for-models"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -2274,119 +2699,6 @@ noprefix "false"
  models.
  In order to get the code for more simple ones you should just remove the
  corresponding pieces.
-\end_layout
-
-\begin_layout Section
-Backup
-\end_layout
-
-\begin_layout Subsection
-By state, simulation
-\end_layout
-
-\begin_layout Standard
-With the described above model the posterior distribution of the logits
- 
-\begin_inset Formula $\nu_{j}$
-\end_inset
-
- has the form
-\begin_inset Formula 
-\begin{align*}
-\nu_{j}|\mu,\tau^{2},y_{j}\sim & N\left(\hat{\nu}_{j},\hat{\sigma}_{j}^{2}\right),
-\end{align*}
-
-\end_inset
-
-where
-\begin_inset Formula 
-\begin{align*}
-\hat{\nu}_{j}= & \frac{y_{j}\pi_{j}+\mu\pi_{\tau}}{\pi_{j}+\pi_{\tau}},\qquad\hat{\sigma}_{j}^{2}=\frac{1}{\pi_{j}+\pi_{\tau}}
-\end{align*}
-
-\end_inset
-
-while 
-\begin_inset Formula $\pi_{j}=\sigma_{j}^{-2}$
-\end_inset
-
- and 
-\begin_inset Formula $\pi_{\tau}=\tau^{-2}$
-\end_inset
-
- are precisions of the observed data and hyper-parameters respectively.
-\end_layout
-
-\begin_layout Standard
-Now the simulation process looks like follows:
-\end_layout
-
-\begin_layout Enumerate
-Draw large number of hyper-parameters 
-\begin_inset Formula $\mu$
-\end_inset
-
-, 
-\begin_inset Formula $\tau^{2}$
-\end_inset
-
- from the non-informative prior distribution
-\end_layout
-
-\begin_layout Enumerate
-For each state 
-\begin_inset Formula $j$
-\end_inset
-
- calculate posterior distribution parameters 
-\begin_inset Formula $\hat{\nu}_{j}$
-\end_inset
-
-, 
-\begin_inset Formula $\hat{\sigma}_{j}^{2}$
-\end_inset
-
-;
-\end_layout
-
-\begin_layout Enumerate
-From the posterior distribution draw means 
-\begin_inset Formula $\nu_{j}$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Enumerate
-From the sampling distribution draw logits 
-\begin_inset Formula $y_{j}$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Enumerate
-Calculate the proportions 
-\begin_inset Formula $\theta_{j}$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-In comparison with binomial model this procedure looks more complicated,
- but we are not dealing here with any unknown distributions, like the one
- presented in relation 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "eq:state-binom-hyperpost"
-plural "false"
-caps "false"
-noprefix "false"
-
-\end_inset
-
-.
 \end_layout
 
 \end_body

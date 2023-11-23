@@ -329,6 +329,37 @@ figure \ref{fig:states-binom-sim} here.
 \end{figure}
 
 
+\subsection{Simple Normal Model}
+
+An alternative approach is to derive posterior distributions of the
+sampling parameters $\nu_{j}$ analytically. With the described above
+model we have
+\begin{align*}
+\nu_{j}|\mu,\tau^{2},y_{j}\sim & N\left(\hat{\nu}_{j},\hat{\sigma}_{j}^{2}\right),
+\end{align*}
+where
+\begin{align*}
+\hat{\nu}_{j}= & \frac{y_{j}\pi_{j}+\mu\pi_{\tau}}{\pi_{j}+\pi_{\tau}},\qquad\hat{\sigma}_{j}^{2}=\frac{1}{\pi_{j}+\pi_{\tau}}
+\end{align*}
+while $\pi_{j}=\sigma_{j}^{-2}$ and $\pi_{\tau}=\tau^{-2}$ are precisions
+of the observed data and hyper-parameters respectively.
+
+Now the simulation process looks like follows:
+\begin{enumerate}
+\item Draw large number of hyper-parameters $\mu$, $\tau^{2}$ from the
+non-informative prior distribution
+\item For each state $j$ calculate posterior distribution parameters $\hat{\nu}_{j}$,
+$\hat{\sigma}_{j}^{2}$;
+\item From the posterior distribution draw means $\nu_{j}$
+\item From the sampling distribution draw logits $y_{j}$
+\item Calculate the proportions $\theta_{j}$.
+\end{enumerate}
+In comparison with binomial model this procedure looks more complicated,
+but we are not dealing here with any unknown distributions, like the
+one presented in relation (\ref{eq:state-binom-hyperpost}). Results
+of this simulation are the same as previously, so we will not present
+them here.
+
 \subsection{Model Comparison}
 
 As you can see, we have two models that seem to describe equally well
@@ -723,34 +754,4 @@ Note that this code corresponds to most complicated from described
 in section \ref{sec:Linear-Regression} models. In order to get the
 code for more simple ones you should just remove the corresponding
 pieces.
-
-\section{Backup}
-
-\subsection{By state, simulation}
-
-With the described above model the posterior distribution of the logits
-$\nu_{j}$ has the form
-\begin{align*}
-\nu_{j}|\mu,\tau^{2},y_{j}\sim & N\left(\hat{\nu}_{j},\hat{\sigma}_{j}^{2}\right),
-\end{align*}
-where
-\begin{align*}
-\hat{\nu}_{j}= & \frac{y_{j}\pi_{j}+\mu\pi_{\tau}}{\pi_{j}+\pi_{\tau}},\qquad\hat{\sigma}_{j}^{2}=\frac{1}{\pi_{j}+\pi_{\tau}}
-\end{align*}
-while $\pi_{j}=\sigma_{j}^{-2}$ and $\pi_{\tau}=\tau^{-2}$ are precisions
-of the observed data and hyper-parameters respectively.
-
-Now the simulation process looks like follows:
-\begin{enumerate}
-\item Draw large number of hyper-parameters $\mu$, $\tau^{2}$ from the
-non-informative prior distribution
-\item For each state $j$ calculate posterior distribution parameters $\hat{\nu}_{j}$,
-$\hat{\sigma}_{j}^{2}$;
-\item From the posterior distribution draw means $\nu_{j}$
-\item From the sampling distribution draw logits $y_{j}$
-\item Calculate the proportions $\theta_{j}$.
-\end{enumerate}
-In comparison with binomial model this procedure looks more complicated,
-but we are not dealing here with any unknown distributions, like the
-one presented in relation (\ref{eq:state-binom-hyperpost}).
 \end{document}
