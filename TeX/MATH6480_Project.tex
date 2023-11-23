@@ -7,6 +7,11 @@
 \usepackage{graphicx}
 
 \makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
 \usepackage{lipsum}
 \usepackage{url}
@@ -530,7 +535,8 @@ only) and some others with increasing complexity. As you can see,
 the zero approximation gives us a reasonable result, and even after
 addition of the first predictor (inequality ration, $\text{IR}_{j}$)
 agreement improves significantly. More complex models also give us
-some increase in accuracy.
+some increase in accuracy. This can be clearly seen from table \ref{tab:DIC-for-models},
+where DIC metrics for different models are shown.
 
 \begin{figure}
 \begin{centering}
@@ -543,6 +549,29 @@ respectively\label{fig:Ohio_LR_comparison}}
  
 
 \end{figure}
+
+\begin{table}
+\begin{centering}
+\begin{tabular}{|c|c|c|c|}
+\hline 
+Model & $\log p\left(y|\theta_{\text{Baayes}}\right)$ & $E\log\left(y|\theta\right)$ & $p_{\text{DIC}}$\tabularnewline
+\hline 
+\hline 
+$b_{0}$ & -333.3049 & -333.7895 & -0.9692657\tabularnewline
+\hline 
+$b_{0}+b_{IR}\text{IR}$ & -240.4385 & -241.3995 & -1.922085\tabularnewline
+\hline 
+$b_{0}+b_{IR}\text{IR}+b_{V}V$ & -233.93 & -235.2663 & -2.672603\tabularnewline
+\hline 
+$b_{0}+b_{IR}\text{IR}+b_{V}V+b_{\text{gdp}}\text{gdp}$ & -221.997 & -223.9866 & -3.979182\tabularnewline
+\hline 
+$b_{0}+b_{IR}\text{IR}+b_{V}V+b_{\text{gdp}}\text{gdp}+b_{\text{pci}}\text{pci}$ & -216.7918 & -219.0379 & -4.492316\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+\caption{DIC for models\label{tab:DIC-for-models}}
+
+\end{table}
 
 In figure \ref{fig:Ohio_LR_pairs} you can see the posterior scatter
 plot of the hyper-parameters. Determined from the simulations posterior

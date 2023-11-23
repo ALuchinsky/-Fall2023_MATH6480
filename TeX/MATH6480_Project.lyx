@@ -2014,6 +2014,269 @@ options "unsrt"
 
 \begin_layout Section
 \start_of_appendix
+Code
+\end_layout
+
+\begin_layout Standard
+In this appendix I presented the code that was used to perform simulations.
+\end_layout
+
+\begin_layout Standard
+I am using R statistical package in my work and most of the simulations
+ were done using JAGS utility (it can be combined with R using rjags library).
+\end_layout
+
+\begin_layout Standard
+In the below you can see JAGS description of the binomial model.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+model {       
+\end_layout
+
+\begin_layout Plain Layout
+
+	for (i in 1:N) {
+\end_layout
+
+\begin_layout Plain Layout
+
+		D[i] ~ dbin(th[i], V[i])
+\end_layout
+
+\begin_layout Plain Layout
+
+		th[i] ~ dbeta(a,b)
+\end_layout
+
+\begin_layout Plain Layout
+
+	}
+\end_layout
+
+\begin_layout Plain Layout
+
+    a ~ dunif(1, 100)
+\end_layout
+
+\begin_layout Plain Layout
+
+	b ~ dunif(1, 100)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+As it is described in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:State-Level-Analysis"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, in this model I am using binomial distribution for sampling, conjugate
+ to it beta-distribution for prior and non-informative uniforms for hyper-parame
+ters 
+\begin_inset Formula $a$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The second model to describe political preferences on the state level was
+ normal.
+ Corresponding JAGS code is
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+model {
+\end_layout
+
+\begin_layout Plain Layout
+
+	for (i in 1:N) {
+\end_layout
+
+\begin_layout Plain Layout
+
+		y[i] ~ dnorm(nu[i], prec[i])
+\end_layout
+
+\begin_layout Plain Layout
+
+		nu[i] ~ dnorm(mu, piTau)
+\end_layout
+
+\begin_layout Plain Layout
+
+	}
+\end_layout
+
+\begin_layout Plain Layout
+
+    mu ~ dunif(-1, 1)
+\end_layout
+
+\begin_layout Plain Layout
+
+    piTau ~ dunif(1, 100)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+In this case both sampling and prior distributions for parameter 
+\begin_inset Formula $\nu_{j}$
+\end_inset
+
+ are normal, while prior distributions for hyper-parameters 
+\begin_inset Formula $\mu$
+\end_inset
+
+ and 
+\begin_inset Formula $\tau$
+\end_inset
+
+ are again non-informative uniform.
+ Note that I am using precision 
+\begin_inset Formula $\tau=1/\sigma^{2}$
+\end_inset
+
+ instead of the variance 
+\begin_inset Formula $\sigma^{2}$
+\end_inset
+
+, so such choice of prior hyper-distribution is reasonable.
+\end_layout
+
+\begin_layout Standard
+For general analysis on the county level I am using presented above binomial
+ model.
+ As for described in section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Linear-Regression"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ linear regression, the corresponding code is
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+model {
+\end_layout
+
+\begin_layout Plain Layout
+
+	for (i in 1:N) {
+\end_layout
+
+\begin_layout Plain Layout
+
+		D[i] ~ dbin(th[i], V[i])
+\end_layout
+
+\begin_layout Plain Layout
+
+		th[i] <- 1/(1+exp(-z[i]))
+\end_layout
+
+\begin_layout Plain Layout
+
+		z[i] <- b0  + b_IR*IR[i]  + b_V*V[i]  + b_gdp*gdp[i]  + b_pci*pci[i]
+\end_layout
+
+\begin_layout Plain Layout
+
+	}
+\end_layout
+
+\begin_layout Plain Layout
+
+	b0 ~ dunif(-1000, 1000)
+\end_layout
+
+\begin_layout Plain Layout
+
+	b_IR~dunif(-1000, 1000)
+\end_layout
+
+\begin_layout Plain Layout
+
+	b_V~dunif(-1000, 1000)
+\end_layout
+
+\begin_layout Plain Layout
+
+	b_gdp~dunif(-1000, 1000)
+\end_layout
+
+\begin_layout Plain Layout
+
+	b_pci~dunif(-1000, 1000)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+Note that this code corresponds to most complicated from described in section
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Linear-Regression"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ models.
+ In order to get the code for more simple ones you should just remove the
+ corresponding pieces.
+\end_layout
+
+\begin_layout Section
 Backup
 \end_layout
 
