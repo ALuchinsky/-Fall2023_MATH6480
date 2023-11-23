@@ -24,6 +24,9 @@
 \makeatother
 
 \usepackage{babel}
+\usepackage{listings}
+\renewcommand{\lstlistingname}{Listing}
+
 \begin{document}
 \title{Bayesian Analysis of the Election Results}
 \subtitle{MATH6480, Final Project}
@@ -624,6 +627,73 @@ You can see all related to this project files in my GitLab repository
 
 
 \appendix
+
+\section{Code}
+
+In this appendix I presented the code that was used to perform simulations.
+
+I am using R statistical package in my work and most of the simulations
+were done using JAGS utility (it can be combined with R using rjags
+library).
+
+In the below you can see JAGS description of the binomial model.
+
+\begin{lstlisting}
+model {       
+	for (i in 1:N) {
+		D[i] ~ dbin(th[i], V[i])
+		th[i] ~ dbeta(a,b)
+	}
+    a ~ dunif(1, 100)
+	b ~ dunif(1, 100)
+}
+\end{lstlisting}
+As it is described in section \ref{sec:State-Level-Analysis}, in
+this model I am using binomial distribution for sampling, conjugate
+to it beta-distribution for prior and non-informative uniforms for
+hyper-parameters $a$ and $b$.
+
+The second model to describe political preferences on the state level
+was normal. Corresponding JAGS code is
+
+\begin{lstlisting}
+model {
+	for (i in 1:N) {
+		y[i] ~ dnorm(nu[i], prec[i])
+		nu[i] ~ dnorm(mu, piTau)
+	}
+    mu ~ dunif(-1, 1)
+    piTau ~ dunif(1, 100)
+}
+\end{lstlisting}
+In this case both sampling and prior distributions for parameter $\nu_{j}$
+are normal, while prior distributions for hyper-parameters $\mu$
+and $\tau$ are again non-informative uniform. Note that I am using
+precision $\tau=1/\sigma^{2}$ instead of the variance $\sigma^{2}$,
+so such choice of prior hyper-distribution is reasonable.
+
+For general analysis on the county level I am using presented above
+binomial model. As for described in section \ref{sec:Linear-Regression}
+linear regression, the corresponding code is
+
+\begin{lstlisting}
+model {
+	for (i in 1:N) {
+		D[i] ~ dbin(th[i], V[i])
+		th[i] <- 1/(1+exp(-z[i]))
+		z[i] <- b0  + b_IR*IR[i]  + b_V*V[i]  + b_gdp*gdp[i]  + b_pci*pci[i]
+	}
+	b0 ~ dunif(-1000, 1000)
+	b_IR~dunif(-1000, 1000)
+	b_V~dunif(-1000, 1000)
+	b_gdp~dunif(-1000, 1000)
+	b_pci~dunif(-1000, 1000)
+}
+\end{lstlisting}
+Note that this code corresponds to most complicated from described
+in section \ref{sec:Linear-Regression} models. In order to get the
+code for more simple ones you should just remove the corresponding
+pieces.
 
 \section{Backup}
 

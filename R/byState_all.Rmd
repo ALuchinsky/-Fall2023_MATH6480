@@ -178,6 +178,17 @@ save_fig("states_2004_hyper_scatter")
 ```
 
 ```{r}
+median(dfM$a)
+median(dfM$b)
+```
+
+
+```{r}
+12/(12+13)
+```
+
+
+```{r}
 dfM %>% transmute(mean = a/(a+b), var = a*b/(a+b)**2/(a+b+1)) %>% 
   tidyr::pivot_longer(cols=c(mean, var)) %>% 
   ggplot(aes(x=value)) + geom_histogram() + facet_wrap(~name, scales = "free")
