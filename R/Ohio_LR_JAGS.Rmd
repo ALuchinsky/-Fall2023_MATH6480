@@ -86,6 +86,19 @@ ohio.data <- data %>%
 ohio.data
 ```
 
+```{r}
+library(xtable)
+```
+
+
+```{r}
+df <- ohio.data %>% transmute(county = county.name, D, R, V) %>% mutate_if(is.numeric, as.integer)
+df_t <- cbind(df[1:29, ], df[30:58,], df[59:87,]) 
+print.xtable(xtable(df_t), file="../TeX/figs/ohioCounties_table.tex",
+             include.rownames = FALSE, size="\\small", floating = FALSE)
+```
+
+
 # Liner Model
 
 ```{r}
