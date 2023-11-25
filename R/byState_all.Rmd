@@ -95,14 +95,16 @@ df %>% filter(year==2000)
 library(xtable)
 ```
 
+```{r}
+df_t
+```
+
 
 ```{r}
-df_t <- df %>% filter(year==2000) %>% select(state, D, R, V) %>% 
-  # mutate(th=D/V, nu=log(D/R)) %>% 
-  mutate_if(is.numeric, round, 2) %>%   filter(state != "Alaska")
+df_t <- df %>% filter(year==2000) %>% transmute(state, D, R, V) %>% 
+  mutate_if(is.numeric, as.integer) %>%   filter(state != "Alaska")
 df_t <- cbind(df_t[1:25,], df_t[26:50,]) 
 str <- print.xtable(xtable(df_t), include.rownames = FALSE, size = "", floating = FALSE)
-str <- gsub(".00","", str)
 writeLines(str, "../TeX/figs/states_table.tex")
 ```
 
