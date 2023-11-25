@@ -2167,11 +2167,9 @@ noprefix "false"
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align*}
-b_{0}\approx & -0.804\pm0.30020,\\
-b_{\text{IR}}\approx & 0.08938\pm0.016730,\\
-b_{\text{V}}\approx & 0.00416\pm0.000853,\\
-b_{\text{gpd}}\approx & -(2.420\pm0.6685)\times10^{-8},\\
-b_{\text{pci}}\approx & -(1.659\pm0.51691)\times10^{-5},
+b_{0}\approx & -0.80\pm0.30, & b_{\text{IR}}\approx0.089\pm0.017,\\
+b_{\text{V}}\approx & 0.0040\pm0.0008, & b_{\text{pci}}\approx-(1.70\pm0.52)\times10^{-5},\\
+b_{\text{gpd}}\approx & -(2.42\pm0.67)\times10^{-8},
 \end{align*}
 
 \end_inset
@@ -2211,7 +2209,7 @@ noprefix "false"
 
 \end_inset
 
- these predictors are strongly correlated.
+ these predictors are  correlated.
 \end_layout
 
 \begin_layout Standard
@@ -2455,6 +2453,12 @@ Tables
 \end_layout
 
 \begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status collapsed
+
+\begin_layout Plain Layout
 \begin_inset ERT
 status open
 
@@ -2470,7 +2474,77 @@ input{./figs/states_table.tex}
 
 \end_layout
 
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Voting Results by states
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:states"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+input{./figs/ohioCounties_table.tex}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Voting Results by counties in Ohio
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:states-1"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
 
 \end_layout
 
