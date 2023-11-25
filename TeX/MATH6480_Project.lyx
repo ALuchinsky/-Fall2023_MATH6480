@@ -2451,6 +2451,30 @@ options "unsrt"
 
 \begin_layout Section
 \start_of_appendix
+Tables
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+input{./figs/states_table.tex}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Section
 Code
 \end_layout
 

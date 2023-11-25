@@ -87,6 +87,24 @@ df %>% filter(year %in% c(2000, 2004)) %>% tidyr::pivot_longer(cols = c(D, R)) %
   # ggtitle("2004 Presidential Elections") + xlab("State") + ylab("Persentage")
 save_fig("states_2000_2004_barplot")
 ```
+```{r}
+df %>% filter(year==2000)
+```
+
+```{r}
+library(xtable)
+```
+
+
+```{r}
+df_t <- df %>% filter(year==2000) %>% select(state, D, R, V) %>% 
+  # mutate(th=D/V, nu=log(D/R)) %>% 
+  mutate_if(is.numeric, round, 2) %>%   filter(state != "Alaska")
+df_t <- cbind(df_t[1:25,], df_t[26:50,]) 
+str <- print.xtable(xtable(df_t), include.rownames = FALSE, size = "", floating = FALSE)
+str <- gsub(".00","", str)
+writeLines(str, "../TeX/figs/states_table.tex")
+```
 
 
 ## Processing data

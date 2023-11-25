@@ -28,8 +28,8 @@ suppressPackageStartupMessages(library(coda))
 ```{r}
 save_fig <- function(name, width = 10, height=5) {
   file_name <- paste0("../TeX/figs/",name,".pdf")
-  cat("Saving figure to ", file_name, "\n")
-  ggsave(file_name, width=width, height = height)
+  cat("NOT Saving aving figure to ", file_name, "\n")
+  # ggsave(file_name, width=width, height = height)
 }
 ```
 
@@ -407,6 +407,11 @@ J4 <- runJAGS(c("IR", "V", "gdp", "pci"), run=TRUE)
 M4 <- J4$M[[1]]
 M <- M4
 ```
+
+```{r}
+cat(J4$str)
+```
+
 
 ```{r}
 M.params <- M %>% data.frame(.) %>% dplyr::select(!starts_with("th"))
