@@ -3,6 +3,7 @@
 \documentclass[english]{scrartcl}
 \usepackage[T1]{fontenc}
 \usepackage[latin9]{inputenc}
+\usepackage{verbatim}
 \usepackage{amsmath}
 \usepackage{graphicx}
 
@@ -39,31 +40,30 @@
 \maketitle
 \begin{abstract}
 The goal of the project is to analyze US presidential elections in
-the 21st century using the bayesian methods. After downloading and
-preprocessing the data I have analyzed them both on state and county
-level using various bayesian models. In the last part of the report
-multiple liner regression model is built to predict political preferences
-of the counties of the Ohio state using various social and economic
-factors as predictors.
+the 21st century using bayesian methods. After downloading and preprocessing
+data I have analyzed them both on state and county level using various
+bayesian models. In the last part of the report multiple liner regression
+model are built to predict political preferences of the counties of
+the Ohio state using various social and economic factors as predictors.
 \end{abstract}
 \tableofcontents{}
 
 \section{Introduction}
 
 I have moved to United States in 2015 and one of the first things
-that surprised me greatly were the presidential elections. In contrast
+that surprised me greatly was the presidential elections. In contrast
 to Russia, where the results are known 2 month before the voting and
-the only question is the support level of the current president (whether
-it will be 75\% or 80\%) in US this process turned out to be very
-interesting, exciting, and unpredictable. Since then I've got a citizenship
-and tool part in all elections.
+only question is how large will be the support level of the current
+president (whether it will be 75\% or 80\%), in US this process turned
+out to be very interesting, exciting, and unpredictable. Since then
+I've got a citizenship and took part in all elections.
 
 In the current project I will use the my statistics and probability
 knowledge to analyze results of US presidential elections in 21st
 century. It is possible to use simple statistical methods to figure
-out mean political preferences of the people of the country of extract
-some more detailed information, but it seems more interesting to me
-to use the Bayesian approach to this problem.
+out mean political preferences of the people of the country or extract
+some more detailed information, but it seems more interesting to use
+the Bayesian approach to this problem.
 
 In the next section I will perform such analysis on state level, describing
 the chances of voting to different parties using two different sampling
@@ -79,28 +79,26 @@ Final results are discussed briefly in the final section.
 I will start my project with the analysis of the United States presidential
 election results on the state level. It is well known that there are
 52 states in our country and every 4 years people of these states
-vote for the person who will be the president of the country during
-next presidential term. The voting system in US is little bit complicated,
-so simple majority of votes does not guarantee the the person who
-got it will be the winner, only electoral college results are important.
-In the following, however, we will neglect this step and consider
-only numbers of votes, given for each of the candidates.
+vote for the person who will be the president during next presidential
+term. The voting system in US is little bit complicated, so simple
+majority of votes does not guarantee that the person who got it will
+be the winner, only electoral college results are important. In the
+following, however, we will neglect this step and consider only numbers
+of votes in favor of each of the candidates.
 
 You can easily find the results of the previous US presidential elections
-in the internet. For example, on reference \cite{MIT} number of votes
-to each major party are presented in each state for from 2000, 2004,
-2008, 2012, 2016, and 2020 years.
-
-It turns out also, that traditionally the candidates represent one
-of the major parties and usually people from Democratic or Republican
-parties receive noticable number of voted. Results of such parties
-as Green, Libertarian, etc, are much smaller. For this reason in the
-following I will concentrate only on votes for Democratic and Republican
-parties and neglect all others.
+online. For example, reference \cite{MIT} gives us numbers of votes
+for each major party in each state for from 2000, 2004, 2008, 2012,
+2016, and 2020 years. It turns out also, that traditionally the candidates
+represent one of the major parties and usually people from Democratic
+or Republican parties receive noticable number of voted. Results of
+such parties as Green, Libertarian, etc, are much smaller. For this
+reason in the following I will concentrate only on votes for Democratic
+and Republican parties and neglect all others. 
 
 In figure \ref{fig:Results-of-2000-2004} you can see the election
 results during 2000 and 2004 years. It is clear that political interests
-of different state are different and some states usually vote for
+of different states are different and some states usually vote for
 democratic candidates, while the other are typically republicans.
 There are also states that are eager to change their position from
 year ti year (so called swing states). For this reason it could be
@@ -123,20 +121,20 @@ As it was already mentioned, in our analysis we will neglect results
 of small parties and consider only candidates from democratic and
 republican parties. In mentioned above data set you can find number
 of votes for each year and each sate, in the following I will denote
-these numbers as $D_{j}$ and $R_{j}$ respectively\footnote{Note that these numbers are in thousands.}.
-Here index $j$ denotes the state under analysis and I neglect the
-year index for a while.
+these numbers as $D_{j}$ and $R_{j}$ respectively (note that these
+numbers are in thousands). Here index $j$ denotes the state under
+analysis and I neglect the year index for a while.
 
-In the framework of Bayesian analysis we should start with determine
-the form of prior distribution. Since we are talking with selection
-of several people for total fixed number, it seems reasonable to use
-the binomial distribution in this case:
+In the framework of Bayesian analysis we should first determine the
+form of sampling distribution. Since we are talking with selection
+of several people from total fixed number, it seems reasonable to
+use the binomial distribution in this case:
 \begin{align}
 D_{j}|\theta_{j}\sim & \text{binom}\left(\theta_{j},V_{j}\right),\label{eq:state-binim-sampling}
 \end{align}
 where $V_{j}=D_{j}+R_{j}$ is total number of voters and parameters
 $\theta_{j}$ represent the percentage of people who prefer democratic
-president for each state. It is clear that sampling pdf is equal to
+president for state $j$. It is clear that sampling pdf is equal to
 \begin{align*}
 p\left(D|\theta\right) & \sim\prod_{j}\theta_{j}^{D_{j}}\left(1-\theta_{j}\right)^{V_{j}-D_{j}},
 \end{align*}
@@ -144,13 +142,12 @@ where we denote complete vectors $\left\{ D_{1},D_{2},\dots\right\} $
 and $\left\{ \theta_{1},\theta_{2},\dots\right\} $ by $D$ and $\theta$
 respectively.
 
-As we know, in Baesian theory parameters $\theta$ are by considered
-as random numbers by itself and before taking observed data into account
+As we know, in Bayesian theory parameters $\theta$ are considered
+as random numbers by itself and before accounting the observed data
 they follow some prior distribution. In principle, one can take any
-distribution as a prior, but it is more convenient to take one from
-conjugate family to the sampling distribution. As we know, conjugate
-distribution for binomial is beta-distribution, so in our analysis
-we will use
+distribution as a prior, but it is more convenient to take it from
+conjugate family to the sampling one. As we know, conjugate family
+for binomial are beta-distributions, so in our analysis we will use
 \begin{align*}
 \theta_{j}|a,b\sim & \text{beta}\left(a,b\right)
 \end{align*}
@@ -161,8 +158,8 @@ p\left(\theta|a,b\right)\sim & \prod_{j}\theta_{j}^{a-1}\left(1-\theta_{j}\right
 In these expressions $a$ and $b$ are hyper-parameters and we will
 discuss their choice later.
 
-The posterior distribution for $\theta_{j}$ can easily derived from
-above relations:
+The posterior distribution for $\theta_{j}$ can be easily derived
+from above relations:
 \begin{align*}
 p\left(\theta_{j}|D_{j},a,b\right)\sim & p\left(D|\theta\right)p(\theta|a,b)\sim\\
  & \prod_{j}\theta_{j}^{a+D_{j}-1}\left(1-\theta_{j}\right)^{b+V_{j}-D_{j}-1},
@@ -189,7 +186,9 @@ Thus, the simulation procedure looks as follows:
 \begin{enumerate}
 \item Draw hyper-parameters $a$, $b$ from some hyper-prior;
 \item Use the accept/reject method to select pairs $\left(a,b\right)$ that
-follows marginal posterior distribution (\ref{eq:state-binom-hyperpost});
+follows marginal posterior distribution (\ref{eq:state-binom-hyperpost}).
+Note that probabilities for some of the samples could be extremely
+small, so it is better to use log-likelihood function in this step;
 \item For each of the selected pairs $\left(a_{s},b_{s}\right)$ use sampling
 distribution (\ref{eq:state-binom-post}) to draw parameters $\theta_{j}$;
 \item Use sampling distribution (\ref{eq:state-binim-sampling}) to draw
@@ -201,9 +200,9 @@ number of democratic votes $D_{j}$.
 Let me consider analysis results for year 2004 first.
 
 In figure \ref{fig:states-binom-hyperscatter} you can see the scatter
-plot of the hyper-parameters $a$, $b$. s you can see, they are concentrated
-near $a\approx12$, $b\approx13$, which gives us an estimate for
-mean value of the parameter $\theta$:
+plot of the hyper-parameters $a$, $b$. As you can see, they are
+concentrated near $a\approx12$, $b\approx13$, which gives us an
+estimate for mean value of the parameter $\theta$:
 \begin{align*}
 \E\theta= & \frac{a}{a+b}\approx0.48.
 \end{align*}
@@ -229,7 +228,7 @@ show that this mean lies in the range
 
 \end{figure}
 
-Let us now consider predictions for specific states. In figure \ref{fig:state-binom-mean-var}
+Let us now consider predictions for specific states. In figure \ref{fig:states-binom-sim}
 you can see comparison of the simulation results for Alabama, Florida,
 and Alaska with observed in 2004 year values. As you can see, the
 agreement is very nice.
@@ -266,9 +265,9 @@ several times during last 20 years.
 
 \subsubsection{Description}
 
-The alternative way to describe the same dataset is to use normal
-distributions. Number of people participating in the elections is
-large enough, so this approach can also give good results.
+An alternative way to describe the same dataset is to use normal distributions.
+Number of people participating in the elections is large enough, so
+this approach can also give good results.
 
 In this model I will talk not about proportions $\theta_{j}$, but
 about logits
@@ -329,6 +328,55 @@ figure \ref{fig:states-binom-sim} here.
 \end{figure}
 
 
+\subsection{Model Comparison}
+
+As you can see, we have two models that seem to describe equally well
+all available data on presidential elections in US on the state level.
+The question arises which of them is better for prediction. One of
+the ways to answer this question is to use some of Bayesian information
+criteria for comparison.
+
+In the following I will discuss Deviance Information criterion (DIC).
+In the case of the first (binom) model, for example, this metric is
+a difference of two estimates of log-likelihood functions:
+\begin{align*}
+p_{DIC}= & -2\left[\log p\left(y|\hat{\theta}_{Bay}\right)-\Epost\log p\left(y|\theta\right)\right],
+\end{align*}
+where
+\begin{align*}
+p\left(y|\theta\right)= & \prod_{j}p_{\text{binom}}\left(y_{j}|\theta_{j},V_{j}\right)
+\end{align*}
+is the posterior probability of the observed data 
+\begin{align*}
+\hat{\theta}_{Bay}= & \Epost\theta=\frac{1}{S}\sum_{s=1}^{S}\theta^{(s)}.
+\end{align*}
+
+Numerical calculations show, that for year 2000 binomial model gives
+us
+\begin{align*}
+\log p\left(y|\hat{\theta}_{Bay}\right)\approx & -196.2,\qquad\Epost\log p\left(y|\theta\right)\approx-220.9,
+\end{align*}
+which gives us
+\begin{align*}
+DIC_{\text{binom}}= & -p_{DIC}\approx-49.6.
+\end{align*}
+
+In the case of the second (normal) model the expressions are almost
+the same. The only difference is that now model parameters are $\nu_{j}$
+and the joint posterior probability is equal to
+\begin{align*}
+p\left(y|\nu\right)= & \prod_{j}p_{\text{norm}}\left(y_{j}|\nu_{j},\sigma_{j}^{2}\right).
+\end{align*}
+Numerical calculations give us
+\begin{align*}
+\log p\left(y|\hat{\nu}_{Bay}\right)\approx & 95.7,\qquad\Epost\log p\left(y|\theta\right)\approx71.0,\\
+DIC_{norm}\approx & -49.4.
+\end{align*}
+As we can see, accuracies of two considered models are very close
+to each other, but binomial model seems to be slightly better. This
+makes sense since binomial distribution is more appropriate for the
+considered problem.
+
 \subsection{Simple Normal Model}
 
 An alternative approach is to derive posterior distributions of the
@@ -360,55 +408,6 @@ one presented in relation (\ref{eq:state-binom-hyperpost}). Results
 of this simulation are the same as previously, so we will not present
 them here.
 
-\subsection{Model Comparison}
-
-As you can see, we have two models that seem to describe equally well
-all available data on presidential elections in US on the state level.
-The question arises which of them is better for prediction. One of
-the ways to answer this question is to use some of Bayesian information
-criteria for comparison.
-
-In the following I will discuss Deviance Information criterion (DIC).
-In the case of the first (binom) model, for example, this metric is
-a difference of two estimates of log-likelyhood functions:
-\begin{align*}
-p_{DIC}= & 2\left[\log p\left(y|\hat{\theta}_{Bay}\right)-\Epost\log p\left(y|\theta\right)\right],
-\end{align*}
-where
-\begin{align*}
-p\left(y|\theta\right)= & \prod_{j}p_{\text{binom}}\left(y_{j}|\theta_{j},V_{j}\right)
-\end{align*}
-is the posterior probability of the observed data 
-\begin{align*}
-\hat{\theta}_{Bay}= & \Epost\theta=\frac{1}{S}\sum_{s=1}^{S}\theta^{(s)}.
-\end{align*}
-
-Numerical calculations show, that for year 2000 binomial model gives
-us
-\begin{align*}
-\log p\left(y|\hat{\theta}_{Bay}\right)\approx & -196.129,\qquad\Epost\log p\left(y|\theta\right)\approx-220.7763,
-\end{align*}
-which gives us
-\begin{align*}
-DIC_{\text{binom}}= & -p_{DIC}\approx-49.29462.
-\end{align*}
-
-In the case of the second (normal) model the expressions are almost
-the same. The only difference is that now model parameters are $\nu_{j}$
-and the joint posterior probability is equal to
-\begin{align*}
-p\left(y|\nu\right)= & \prod_{j}p_{\text{norm}}\left(y_{j}|\nu_{j},\sigma_{j}^{2}\right).
-\end{align*}
-Numerical calculations give us
-\begin{align*}
-\log p\left(y|\hat{\nu}_{Bay}\right)\approx & 95.77597,\qquad\Epost\log p\left(y|\theta\right)\approx71.0093,\\
-DIC_{norm}\approx & -49.53334.
-\end{align*}
-As we can see, accuracies of two considered models are very close
-to each other, but binomial model seems to be slightly better. This
-makes sense since binomial distribution is more appropriate for the
-considered problem.
-
 \section{County-Level Analysis\label{sec:County-Level-Analysis}}
 
 \subsection{Dataset Description}
@@ -422,20 +421,19 @@ find some reasons for such differences and changes. A more detailed
 analysis, however, show that each state is not uniform, political
 preferences of various towns and cities in one state can differ significantly.
 This tells us the state is a too large unit and we should consider
-smaller units, e.g. counties.
+smaller divisions, e.g. counties.
 
 The considered above data set contains information about collected
 in 2000-2020 years votes not only on state level, but also for each
 county of each state, so we can use this information source for more
 detailed analysis. It could be also interesting to use some data about
 economic and social situation in counties, that can influence the
-political preferences. Such data can be found, for example, on the
-official site of the Federal Reserve Bank \cite{FRED}. On this site
-for each county you can find detailed information about population,
-personal income inequality, etc. You can download tables that you
-need both directly from the browser, or using advanced API. The last
-method is much more convenient for bulk downloads, so I have used
-it.
+political preferences. Such data is presented, for example, on the
+official site of the Federal Reserve Bank \cite{FRED}, where for
+each county you can find detailed information about population, personal
+income inequality, etc. You can download tables that you need both
+directly from the browser, or using advanced API. The last method
+is much more convenient for bulk downloads, so I have used it.
 
 \subsection{Binomial Model}
 
@@ -448,12 +446,12 @@ be considered as distributed binomially with parameters $\theta_{j}$,
 which by themself have the prior beta distribution with uninformative
 uniform distribution for hyper-parameters $a$ and $b$. In figures
 \ref{fig:county-hyper-scatter}, \ref{fig:county-hyper-hist} you
-can see posterior scatter plot these hyper-parameters and the posterior
+can see posterior scatter plot of these hyper-parameters and the posterior
 mean and variance of the distribution parameter $\theta$. It is clear,
 that in comparison with the state level (see figure \ref{fig:state-binom-mean-var}),
 mean value of $\theta$ is smaller and the histogram is wider. The
-reason for the latter difference is clear: number of votes on county
-level are small in comparison with state level, so more variances
+reason for the latter difference is clear: number of votes on the
+county level are small in comparison with state level, so more variances
 are expected.
 
 \begin{figure}
@@ -468,13 +466,13 @@ are expected.
 \begin{centering}
 \includegraphics[width=0.9\textwidth]{figs/byCounty/hyper-hist}
 \par\end{centering}
-\caption{Posterior scatter of the hyper-paarameters on the county level\label{fig:county-hyper-hist}}
+\caption{Posterior scatter of the hyper-parameters on the county level\label{fig:county-hyper-hist}}
 \end{figure}
 
-The same result can be clearly seen in figure, where simulation results
-for 3 counties are compared with the actual data. As you can see,
-peaks of the distributions agree perfectly with the numbers, but the
-uncertaintintess are noticeable. 
+The same result can be clearly seen in figure \ref{fig:county-th-hist-1},
+where simulation results for 3 counties are compared with the actual
+data. As you can see, peaks of the distributions agree reasonably
+with the observations, but the uncertaintintess are noticeable. 
 
 \begin{figure}
 \begin{centering}
@@ -485,8 +483,8 @@ Left, center and right panels correspond to Autauga, Cherokee, and
 Baldwin counties (Alabama state) \label{fig:county-th-hist-1}}
 \end{figure}
 
-The last interesting figure that I would like to show in this section
-is the dependence of the political prefrences on the population of
+The last interesting figure that I would like to show in this subsection
+is the dependence of the political preferences on the population of
 the county. As you can see from figure \ref{fig:county-th-V}, the
 correlation is not very prominent, but we can suggest that with the
 increase of the population percentage of votes in favor of democratic
@@ -500,19 +498,19 @@ party increases.
 \end{figure}
 
 
-\section{Linear Regression\label{sec:Linear-Regression}}
+\subsection{Linear Regression\label{sec:Linear-Regression}}
 
-This result shows, that there could be some hope to determine the
-political preferences of the county using various social and economic
-factors as predictors. As it was mentioned earlier, Federal Reserve
-Bank database provides us such information for all the counties. In
-this subsection I will consider some of them. For simplicity only
-situation with the Ohio state counties will be considered in this
-subsection and we will restrict ourself to year 2000.
+This result shows, that there could be some hope to determine political
+preferences of the counties using various social and economic factors
+as predictors. As it was mentioned earlier, Federal Reserve Bank database
+provides us such information for all the counties, and in this subsection
+I will consider some of them. For simplicity only situation with the
+Ohio state counties will be considered in this subsection and we will
+restrict ourself to year 2000.
 
 In total there are 87 counties in Ohio and for each of them number
 of votes for democratic and republican parties are know. As previously,
-in our Bayesian approach we will use binomial sampling distribution
+in our Bayesian approach the binomial sampling distribution
 \begin{align*}
 D_{i}|\theta_{j}\sim & \text{binom}\left(\theta_{j},V_{j}\right)
 \end{align*}
@@ -536,7 +534,7 @@ $\text{GDP}_{j}$, and $\text{PCI}_{j}$ respectively.
 The simplest model to use in this case is Multiple linear model. It
 cannot be applied directly to $\theta_{j}$ since allowed value range
 for this parameter is $\theta_{j}\in\left[0;1\right]$. As previously,
-this problem can be used if we consider not the preference proportions
+this problem can be solved if we consider not the preference proportions
 themselves, but the logits
 \begin{align*}
 y_{j}= & \log\frac{\theta_{j}}{1-\theta_{j}}=\log\frac{D_{j}}{R_{j}}.
@@ -588,15 +586,15 @@ respectively\label{fig:Ohio_LR_comparison}}
 Model & $\log p\left(y|\theta_{\text{Baayes}}\right)$ & $E\log\left(y|\theta\right)$ & $p_{\text{DIC}}$\tabularnewline
 \hline 
 \hline 
-$b_{0}$ & -333.3049 & -333.7895 & -0.9692657\tabularnewline
+$b_{0}$ & -333.30 & -333.79 & -0.97\tabularnewline
 \hline 
-$b_{0}+b_{IR}\text{IR}$ & -240.4385 & -241.3995 & -1.922085\tabularnewline
+$b_{0}+b_{IR}\text{IR}$ & -240.4 & -241.4 & -1.9\tabularnewline
 \hline 
-$b_{0}+b_{IR}\text{IR}+b_{V}V$ & -233.93 & -235.2663 & -2.672603\tabularnewline
+$b_{0}+b_{IR}\text{IR}+b_{V}V$ & -233.93 & -235.26 & -2.6\tabularnewline
 \hline 
-$b_{0}+b_{IR}\text{IR}+b_{V}V+b_{\text{gdp}}\text{gdp}$ & -221.997 & -223.9866 & -3.979182\tabularnewline
+$b_{0}+b_{IR}\text{IR}+b_{V}V+b_{\text{gdp}}\text{gdp}$ & -221.997 & -223.98 & -3.98\tabularnewline
 \hline 
-$b_{0}+b_{IR}\text{IR}+b_{V}V+b_{\text{gdp}}\text{gdp}+b_{\text{pci}}\text{pci}$ & -216.7918 & -219.0379 & -4.492316\tabularnewline
+$b_{0}+b_{IR}\text{IR}+b_{V}V+b_{\text{gdp}}\text{gdp}+b_{\text{pci}}\text{pci}$ & -216.79 & -219.04 & -4.49\tabularnewline
 \hline 
 \end{tabular}
 \par\end{centering}
@@ -619,11 +617,11 @@ b\approx & \E b\pm\sqrt{\var b}
 \end{align*}
 notation was used. As you can see, all the predictors seem to be significant.
 It is interesting to note, that the coefficient of the $\text{IR}$
-predictor is positive, meaning that high inequality increase the chances
-of the democratic party. The coefficients $b_{\text{GPD}}$, $b_{\text{PCI}}$,
-on the other hand, are negative. One should keep in mind, however,
-that according to figure \ref{fig:Ohio_LR_pairs} these predictors
-are  correlated.
+predictor is positive, meaning that high inequality increases the
+chances of the democratic party. The coefficients $b_{\text{GPD}}$,
+$b_{\text{PCI}}$, on the other hand, are negative. One should keep
+in mind, however, that according to figure \ref{fig:Ohio_LR_pairs},
+these predictors are correlated.
 
 \begin{figure}
 \begin{centering}
@@ -664,12 +662,12 @@ Current project is devoted to analysis of US election results in the
 21st century.
 
 I have considered available data about these elections both on state
-and county levels in the framework of the Bayesian approach using
+and county levels in the framework of the Bayesian approach, using
 two sampling distributions: binomial and normal. The prior distributions
 for the parameters were selected from the corresponding conjugated
 distributions and I have used non-informative hyper-priors for the
-hyper-parameters.Such approach allowed me to determine the posterior
-domain range of these hyper-parameters and make posterior preductions
+hyper-parameters. Such approach allowed me to determine the posterior
+domain range of these hyper-parameters and make posterior predictions
 for the election chances of different parties. They turned out to
 be in good agreement with observed data.
 
@@ -691,6 +689,7 @@ You can see all related to this project files in my GitLab repository
 
 
 \appendix
+\begin{comment}
 
 \section{Tables}
 
@@ -698,7 +697,6 @@ You can see all related to this project files in my GitLab repository
 \input{./figs/states_table.tex}
 
 \caption{Voting Results by states\label{tab:states}}
-
 \end{table}
 
 \begin{table}
@@ -706,6 +704,7 @@ You can see all related to this project files in my GitLab repository
 
 \caption{Voting Results by counties in Ohio\label{tab:states-1}}
 \end{table}
+\end{comment}
 
 
 \section{Code}
@@ -714,7 +713,7 @@ In this appendix I presented the code that was used to perform simulations.
 
 I am using R statistical package in my work and most of the simulations
 were done using JAGS utility (it can be combined with R using rjags
-library).
+library \cite{JAGS}).
 
 In the below you can see JAGS description of the binomial model.
 
