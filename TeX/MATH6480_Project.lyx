@@ -2566,7 +2566,16 @@ In this appendix I presented the code that was used to perform simulations.
 
 \begin_layout Standard
 I am using R statistical package in my work and most of the simulations
- were done using JAGS utility (it can be combined with R using rjags library).
+ were done using JAGS utility (it can be combined with R using rjags library
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "JAGS"
+literal "false"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Standard
@@ -2817,6 +2826,16 @@ noprefix "false"
  models.
  In order to get the code for more simple ones you should just remove the
  corresponding pieces.
+ In my R code (available on GitLab repository 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "LuchGitLab"
+literal "false"
+
+\end_inset
+
+) I've created a function that produces this JAGS script for any combination
+ of the predictors.
 \end_layout
 
 \end_body
