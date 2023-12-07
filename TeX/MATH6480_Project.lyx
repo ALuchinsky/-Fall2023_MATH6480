@@ -2417,7 +2417,7 @@ In the final section of the report I an using such social and economic metrics
 You can see all related to this project files in my GitLab repository 
 \begin_inset CommandInset citation
 LatexCommand cite
-key "LuchGitLab"
+key "LuchGitLab,LuchGitLab_public"
 literal "false"
 
 \end_inset
@@ -2829,7 +2829,7 @@ noprefix "false"
  In my R code (available on GitLab repository 
 \begin_inset CommandInset citation
 LatexCommand cite
-key "LuchGitLab"
+key "LuchGitLab,LuchGitLab_public"
 literal "false"
 
 \end_inset
